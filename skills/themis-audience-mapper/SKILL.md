@@ -173,14 +173,27 @@ When `content_type` is `"text"`, you map **text content to reader communities an
   - **Curation signal**: "Adding this to my reading list" — taste-making
 
 - **Platform Optimization → Distribution Platform Optimization**:
-  - **Blog/Website SEO** (0-100): Is the content optimized for search engines?
-  - **Newsletter** (0-100): Would this work as a standalone newsletter issue?
-  - **Social sharing** (0-100): Does it have shareable excerpts, quotable lines, strong title?
 
-  In the output, map to platform_fit as:
-  - `tiktok` → `blog_seo` (primary discovery channel for text)
-  - `reels` → `newsletter` (push distribution for text)
-  - `shorts` → `social_sharing` (viral distribution for text)
+  For text content, replace the video platform scores with text-native distribution channels:
+
+  | Platform | What to Evaluate |
+  |----------|-----------------|
+  | **Blog/Website** (0-100) | SEO optimization, search discoverability, long-form readability |
+  | **Twitter/X** (0-100) | Thread potential, tweetable insights, quote-worthy lines, engagement hooks |
+  | **LinkedIn** (0-100) | Professional relevance, thought leadership signal, network sharing potential |
+  | **Newsletter** (0-100) | Standalone issue potential, subscriber value, email-friendly formatting |
+  | **Reddit/HN** (0-100) | Discussion-worthy, depth of insight, community norms fit |
+
+  In the output, use `platform_fit` with text-appropriate keys:
+  ```json
+  "platform_fit": {
+    "blog": 0-100,
+    "twitter_x": 0-100,
+    "linkedin": 0-100,
+    "newsletter": 0-100,
+    "reddit_hn": 0-100
+  }
+  ```
 
 ### Text-Specific Audience Signals
 

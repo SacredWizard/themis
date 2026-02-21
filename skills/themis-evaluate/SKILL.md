@@ -201,7 +201,7 @@ Use the themis-synthesizer skill. The synthesizer should:
 - **<community>** (relevance: <score>) — TikTok: <score> | Reels: <score> | Shorts: <score>
   <reasoning>
 <for each audience — text content>
-- **<community>** (relevance: <score>) — Blog/SEO: <score> | Newsletter: <score> | Social: <score>
+- **<community>** (relevance: <score>) — Blog: <score> | Twitter/X: <score> | LinkedIn: <score> | Newsletter: <score> | Reddit/HN: <score>
   <reasoning>
 
 ### Top Recommendations

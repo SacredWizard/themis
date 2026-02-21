@@ -33,12 +33,18 @@ All Themis evaluations produce output conforming to this schema. Judges produce 
   "distribution": {
     "primary_audiences": [
       {
-        "community": "string — specific community name (e.g., 'BookTok', 'Sneakerheads')",
+        "community": "string — specific community name (e.g., 'BookTok', 'Sneakerheads', 'Dev Twitter')",
         "relevance_score": "integer 0-100",
         "platform_fit": {
-          "tiktok": "integer 0-100",
-          "reels": "integer 0-100",
-          "shorts": "integer 0-100"
+          "comment": "For video: tiktok, reels, shorts. For text: blog, twitter_x, linkedin, newsletter, reddit_hn",
+          "tiktok": "integer 0-100 (video only)",
+          "reels": "integer 0-100 (video only)",
+          "shorts": "integer 0-100 (video only)",
+          "blog": "integer 0-100 (text only)",
+          "twitter_x": "integer 0-100 (text only)",
+          "linkedin": "integer 0-100 (text only)",
+          "newsletter": "integer 0-100 (text only)",
+          "reddit_hn": "integer 0-100 (text only)"
         },
         "reasoning": "string — why this community would engage"
       }
