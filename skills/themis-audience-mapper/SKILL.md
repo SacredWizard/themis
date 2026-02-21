@@ -152,6 +152,56 @@ For each audience mapping, cite:
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you map **text content to reader communities and distribution platforms** instead of video viewer communities. No keyframes are provided; all signals come from the written content.
+
+### What Changes for Text
+
+- **Community Fit**: Same framework but with text-specific community signals:
+  - **Text communities**: Hacker News, r/programming, Dev.to, Medium tags, Substack categories, LinkedIn niches, industry Slacks
+  - **Language/jargon signals**: Technical vocabulary, slang, acronyms that signal in-group belonging
+  - **Reference signals**: Who/what is cited reveals the community (citing Paul Graham = startup community; citing Dijkstra = CS academic community)
+  - **Content depth signals**: Surface-level overview → broad audience; deep technical dive → specialist community
+
+- **Share Motivation**: Text-specific share drivers:
+  - **Social currency**: "I found this insightful article" — makes sharer look smart
+  - **Utility**: "This tutorial will save you hours" — practical value
+  - **Identity expression**: "This captures exactly how I feel about X" — values alignment
+  - **Discussion starter**: "Controversial take, what do you think?" — debate fuel
+  - **Reference material**: "Bookmarking this for later" — save and share
+  - **Curation signal**: "Adding this to my reading list" — taste-making
+
+- **Platform Optimization → Distribution Platform Optimization**:
+  - **Blog/Website SEO** (0-100): Is the content optimized for search engines?
+  - **Newsletter** (0-100): Would this work as a standalone newsletter issue?
+  - **Social sharing** (0-100): Does it have shareable excerpts, quotable lines, strong title?
+
+  In the output, map to platform_fit as:
+  - `tiktok` → `blog_seo` (primary discovery channel for text)
+  - `reels` → `newsletter` (push distribution for text)
+  - `shorts` → `social_sharing` (viral distribution for text)
+
+### Text-Specific Audience Signals
+
+| Signal | Audience Indicator |
+|--------|-------------------|
+| Code snippets | Developer communities |
+| Research citations | Academic/professional audiences |
+| Pop culture references | General/entertainment audiences |
+| Industry acronyms | Specialist professional communities |
+| Personal anecdotes | Personal development/lifestyle audiences |
+| Data visualizations | Data/analytics communities |
+| Brand/product mentions | Consumer/review communities |
+
+### Text-Specific Anti-Patterns
+
+- **Audience-agnostic writing**: No signals for any specific community
+- **Mixed register**: Academic tone with casual slang — confuses audience mapping
+- **Platform mismatch**: Long-form essay with no SEO structure on a search-driven platform
+- **Echo chamber content**: Only resonates with people who already agree
+- **Missing distribution hooks**: No shareable excerpts, pull quotes, or tweetable insights
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Trend Analyst and Subject Analyst:

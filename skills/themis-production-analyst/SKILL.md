@@ -132,6 +132,57 @@ A perfectly executed lo-fi video can score 85+. An overproduced brand ad that fe
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you evaluate **formatting, readability, structure, and media embeds** — the text equivalents of production quality. No keyframes are provided; work entirely from the written content and its structure.
+
+### What Changes for Text
+
+- **Visual Quality → Formatting Quality**: Evaluate the visual presentation of text:
+  - **Headings and hierarchy**: Proper use of H1/H2/H3, logical section structure
+  - **Paragraph length**: Appropriate for the platform (blog, social, newsletter)
+  - **White space**: Scannable or wall-of-text?
+  - **Typography signals**: Bold, italics, blockquotes used effectively
+  - **Lists and bullets**: Used to break up dense information where appropriate
+
+- **Pacing → Reading Flow**: Evaluate the reading experience:
+  - **Sentence variety**: Mix of short and long sentences for rhythm
+  - **Section length**: Balanced sections or uneven lumps?
+  - **Information density**: Too much jargon? Too padded? Right amount of detail?
+  - **Transition quality**: Smooth flow between paragraphs and sections
+  - **Length appropriateness**: Is the article the right length for its content?
+
+- **Audio Quality → Readability**: Evaluate how easy the text is to consume:
+  - **Reading level**: Appropriate for the target audience (Flesch-Kincaid approximation)
+  - **Jargon management**: Technical terms explained, or assumed?
+  - **Sentence clarity**: Can each sentence be understood on first read?
+  - **Active vs passive voice**: Overuse of passive construction
+
+- **Editing Craft → Writing Craft**: Evaluate the technical quality of writing:
+  - **Grammar and spelling**: Errors that undermine credibility
+  - **Consistency**: Consistent style, tense, person throughout
+  - **Conciseness**: No unnecessary words, tight prose
+  - **Media integration**: Images, charts, code blocks, embedded content well-placed?
+  - **Links and references**: Supporting links used effectively, not excessively
+
+### Text Production Tiers
+
+| Tier | Characteristics | Typical Content |
+|------|---------------|-----------------|
+| **Professional** | Edited by professionals, polished, branded | Major publications, corporate blogs |
+| **Prosumer** | Well-written, clear structure, minor rough edges | Popular substacks, established bloggers |
+| **Creator-native** | Casual but effective, personality-driven | Personal blogs, Medium posts, newsletters |
+| **Lo-fi/Raw** | Rough, unedited, but authentic | Twitter threads expanded, quick takes, dev logs |
+
+### Text-Specific Anti-Patterns
+
+- **Wall of text**: No headings, no breaks, no visual relief
+- **Over-formatting**: Bold on every other sentence, excessive emoji, too many callout boxes
+- **SEO-stuffed**: Keyword repetition that breaks natural reading flow
+- **Copy-paste structure**: Every section follows identical template pattern
+- **Missing media**: Long technical explanation that cries out for a diagram or example
+- **Link rot**: References to external content that feels outdated or broken
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Hook Analyst and Emotion Analyst:

@@ -117,6 +117,51 @@ For each score, cite specific evidence:
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you evaluate the **narrative arc, emotional tone, and persuasive technique** across the full text. No keyframes are provided; work entirely from the written content.
+
+### What Changes for Text
+
+- **Emotional Arc**: Track tone shifts across sections/paragraphs rather than visual frames. Text emotional arcs are driven by:
+  - **Word choice evolution**: Does vocabulary intensity increase or decrease?
+  - **Sentence rhythm**: Short punchy sentences for urgency, long flowing ones for reflection
+  - **Section-level beats**: Each section or subheading can mark an emotional shift
+  - **Opening-to-closing trajectory**: Does the piece end on a different emotional note than it starts?
+
+- **Persuasion Strength**: Evaluate written persuasion techniques:
+  - **Storytelling**: Anecdotes, case studies, personal narratives
+  - **Data/evidence**: Statistics, research citations, expert quotes
+  - **Rhetorical devices**: Metaphor, analogy, repetition, tricolon
+  - **Call-to-action**: Newsletter signup, share prompt, product link, comment invitation
+
+- **Authenticity**: Evaluate whether the writing voice feels genuine:
+  - **Personal voice**: Does it sound like a human with opinions, or a content mill?
+  - **Vulnerability signals**: Admitting uncertainty, sharing failures, nuanced positions
+  - **Specificity**: Concrete details vs vague generalities
+  - **Consistency**: Does the tone match across the piece?
+
+- **Memorability**: What sticks from the text:
+  - **Quotable lines**: Phrases a reader might highlight or share
+  - **Key insight**: Is there a single idea that's genuinely novel or well-articulated?
+  - **Framework/mental model**: Does it give the reader a new way to think about something?
+  - **Reread potential**: Would a reader bookmark this?
+
+### Text-Specific Evidence
+
+- **Quote specific passages**: "In paragraph 3, the shift from humor to sincerity..."
+- **Section transitions**: "The transition between the anecdote and the data section..."
+- **Language patterns**: "The use of short imperative sentences in the conclusion..."
+- **Structural choices**: "The bulleted list breaks the emotional flow..."
+
+### Text-Specific Anti-Patterns
+
+- **Monotone prose**: Same sentence structure, no rhythm variation, no emotional peaks
+- **Emotional manipulation without substance**: Heavy emotional language with no supporting evidence
+- **Listicle flatness**: Enumerated points with no connecting narrative
+- **Corporate voice**: Safe, committee-approved language with no personality
+- **Incongruent tone**: Humorous headline with dry academic content
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Hook Analyst and Production Analyst:

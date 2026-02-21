@@ -149,6 +149,51 @@ For each detected subject and theme, cite:
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you perform subject and theme detection from **written content only**. No keyframes are provided; all detection comes from the text, sections, and metadata.
+
+### What Changes for Text
+
+- **Layer 1: Concrete Elements → Text-Derived Elements**:
+
+  | Category | What to Detect in Text |
+  |----------|----------------------|
+  | **People** | Named individuals, quoted experts, referenced authors, personas described |
+  | **Objects/Products** | Products reviewed, tools mentioned, technologies discussed |
+  | **Settings** | Industries, markets, geographic contexts described |
+  | **Activities** | Actions described, processes explained, workflows covered |
+  | **Text/Graphics** | Code snippets, data tables, embedded media references |
+  | **Tone/Voice** | Formal, casual, humorous, academic, conversational |
+
+- **Layer 2: Abstract Themes** — Same framework as video but detected through:
+  - **Keyword density**: Frequently recurring terms indicate primary themes
+  - **Section headings**: Headings explicitly state sub-themes
+  - **Conclusion/summary**: Final sections often crystallize the core theme
+  - **Metaphors and analogies**: Reveal implicit themes the author may not state directly
+
+- **Layer 3: Content Classification** — Additional text-specific categories:
+  - **Thought leadership**: Original frameworks, novel perspectives, industry analysis
+  - **Technical**: Code tutorials, architecture guides, implementation walkthroughs
+  - **Personal narrative**: Memoir, career story, lessons learned
+  - **Curation**: Roundups, "awesome lists", resource collections
+  - **Analysis**: Data-driven, research-based, deep dives
+
+### Text-Specific Evidence
+
+- **Keyword extraction**: "The terms 'machine learning' and 'LLM' appear 12 times..."
+- **Section analysis**: "The heading structure reveals three distinct themes..."
+- **Quote analysis**: "Expert quotes from [X] and [Y] frame the discussion around..."
+- **Metadata signals**: "The title contains keywords: [X], suggesting niche: [Y]"
+
+### Text-Specific Anti-Patterns
+
+- **Keyword stuffing**: Artificially repeated terms that don't reflect genuine focus
+- **Title-body mismatch**: Title promises one subject, body delivers another
+- **Scope creep**: Article tries to cover too many subjects, none deeply
+- **Missing thesis**: No clear central argument or topic statement
+- **Category confusion**: Content doesn't fit any recognizable content category
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Trend Analyst and Audience Mapper:

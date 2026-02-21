@@ -129,6 +129,53 @@ For each score, cite specific evidence:
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you evaluate **topic trend alignment, content format trends, and timing** based on the text content. No keyframes are provided; work entirely from the written content.
+
+### What Changes for Text
+
+- **Trending Format → Content Format Trends**: Evaluate whether the article format is currently popular:
+  - **Format types**: Listicle, deep dive, personal essay, how-to guide, opinion piece, interview, roundup, comparison, case study, thread-to-blog
+  - **Format lifecycle**: Is this format rising, peak, declining, or evergreen in the text content space?
+  - **Platform format alignment**: Does the format suit the likely distribution channel? (Blog, newsletter, LinkedIn, Medium, Substack)
+
+- **Trending Audio/Sound → N/A**: Not applicable for text. Ignore this dimension.
+
+- **Trending Topic**: Does the text address a currently active topic?
+  - **Discourse participation**: Is it joining an ongoing conversation?
+  - **Keyword currency**: Are the keywords/topics trending in search and social?
+  - **News peg**: Is there a timely hook connecting to current events?
+  - **Evergreen vs timely**: Is the content time-sensitive or permanently relevant?
+
+- **Cultural Moment**: Does the text tap into the cultural zeitgeist?
+  - **Discourse trends**: Is this a hot-button topic people are debating?
+  - **Industry moments**: Product launches, policy changes, cultural shifts
+  - **Seasonal relevance**: Year-end lists, back-to-school, new year planning
+
+- **Format Alignment → Platform Format Alignment**:
+  - **SEO optimization**: Is the content structured for search discovery?
+  - **Social sharing format**: Does it have shareable snippets, pull quotes, tweetable insights?
+  - **Newsletter fit**: Would this work as a newsletter issue?
+  - **Length-to-value ratio**: Is the length appropriate for the trending content length on the platform?
+
+### Text-Specific Trend Signals
+
+| Signal Type | What to Look For |
+|-------------|-----------------|
+| **Topic keywords** | Terms that are currently high-volume in search/social |
+| **Discourse markers** | "The debate about...", "Everyone's talking about..." |
+| **Recency signals** | Dates, "recently", "just announced", "this week" |
+| **Counter-trend signals** | "Actually, X is overrated..." (contrarian takes on hot topics) |
+| **Platform references** | Mentions of trending tweets, viral posts, popular threads |
+
+### Text-Specific Anti-Patterns
+
+- **Stale take**: Writing about a topic that peaked weeks ago without adding new perspective
+- **Trend-blind**: Content that could have been published at any time, ignoring current conversation
+- **Forced relevance**: Awkwardly connecting unrelated content to a trending topic
+- **SEO-first writing**: Optimized for keywords but disconnected from actual discourse
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Subject Analyst and Audience Mapper:

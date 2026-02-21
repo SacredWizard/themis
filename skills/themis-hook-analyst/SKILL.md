@@ -113,6 +113,50 @@ Produce your evaluation as JSON:
 }
 ```
 
+## Text Evaluation
+
+When `content_type` is `"text"`, you evaluate the **headline and opening paragraph** — the text equivalent of a video hook. No keyframes are provided; work entirely from the text content.
+
+### What Changes for Text
+
+- **First Frame Impact → Headline Impact**: Evaluate the headline/title for attention-grabbing power, clarity, and curiosity trigger
+- **Attention Grab → Opening Line**: The first sentence or paragraph — does it pull the reader in?
+- **Curiosity Gap**: Does the opening create a reason to keep reading? Information asymmetry, promise of payoff, unanswered questions
+- **Opening Strength → Structural Hook**: Evaluate the hook pattern used in writing:
+  - **Bold claim** ("Everything you know about X is wrong")
+  - **Question** ("Have you ever wondered why...?")
+  - **Story launch** ("Last Tuesday, I discovered something...")
+  - **Statistic/fact** ("97% of people don't know...")
+  - **Contradiction** ("You'd think X, but actually...")
+  - **Direct address** ("If you're struggling with X, read this")
+  - **Scene-setting** ("Picture this: you're standing in...")
+
+### Text-Specific Evidence
+
+- **Headline analysis**: Quote the headline, assess word choice, length, emotional charge
+- **First paragraph**: Quote the opening 1-3 sentences, analyze hook technique
+- **Subheadline/subtitle**: If present, does it complement or undermine the hook?
+- **Reading threshold**: At what point would a typical reader decide to stay or leave?
+
+### Text-Specific Anti-Patterns
+
+- **Buried lede**: The interesting claim is in paragraph 3, not paragraph 1
+- **Generic opening**: "In today's fast-paced world..." or "Have you ever..."
+- **Abstract start**: Opening with definitions or background instead of a hook
+- **Clickbait headline**: Title promises something the content doesn't deliver
+- **Wall of text**: No visual break in the first screenful — readers bounce
+
+### Text Hook Types
+
+| Hook Type | Text Example |
+|-----------|-------------|
+| Bold claim | "SEO is dead. Here's what replaced it." |
+| Question | "Why do 90% of startups fail in year one?" |
+| Story launch | "I was $50K in debt when I discovered..." |
+| Statistic | "The average person spends 7 hours a day on screens." |
+| Contradiction | "The best writers break every grammar rule." |
+| Direct address | "If you're a developer who hates meetings, this is for you." |
+
 ## Round 2 Behavior
 
 In Round 2, after seeing peer assessments from the Emotion Analyst and Production Analyst:
