@@ -76,18 +76,14 @@ Plus: executive summary, strengths/weaknesses, improvement suggestions, council 
 - **Short-form video and text only.** The evaluation framework is tuned for short-form video ads (TikTok, Reels, Shorts) and blog-length text content. Long-form video, podcasts, or other formats are not currently supported.
 - **Cost estimates are approximations.** Token counts and costs are estimated based on typical content; actual costs vary with content length and image count.
 
-## What I Would Improve With More Time
+## Future Improvements
 
 - **Audio fingerprinting (Phase 4):** Integrate an API (AudD, ACRCloud, or Shazam) to identify background music and cross-reference with Spotify/TikTok trending data. This would add a real `music_virality` signal instead of inferring audio from transcript cues.
 - **Video/audio forensics for AI detection:** Detect TTS (text-to-speech) patterns, synthetic voice artifacts, and AI-generated video tells. Currently authenticity analysis is text-only.
 - **Evaluation history and benchmarking:** Store past evaluations in a local database to enable trend analysis, comparative scoring, and calibration against real-world virality outcomes.
 - **A/B comparison mode:** Evaluate two pieces of content side-by-side with relative ranking and differential analysis.
-- **Custom scoring weights:** Let users override the default virality component weights (e.g., prioritize hook effectiveness at 40% for TikTok-first content).
-- **Music trend detection API:** Integrate a music trends API to score whether background audio uses currently viral sounds, trending songs, or rising audio memes — a major virality signal on TikTok and Reels.
-- **URL input support:** Accept links (YouTube, blog URLs, social media posts) and automatically fetch/extract the content for evaluation.
-- **Fact-checking / claim verification:** Integrate with fact-checking services (Snopes, ClaimBuster, or similar APIs) to flag potentially misleading claims in content.
+- **URL input support:** Accept links (YouTube, blog URLs, social media posts) and automatically fetch/extract the content for evaluation, while accounting for prompt injection attacks .
 - **Multi-modal authenticity checks:** Extend AI detection beyond text to include visual artifact detection (AI-generated images/video), synthetic voice detection, and metadata forensics.
-- **MCP server migration:** Replace Python script Bash calls with a Model Context Protocol server for cleaner tool integration, streaming progress, and persistent state.
 
 ## Detailed Documentation
 
