@@ -95,6 +95,18 @@ Build the `authenticity` section from the Authenticity Analyst's output:
 
 If no Authenticity Analyst output is available, omit the `authenticity` section entirely (backward compatible).
 
+### Step 5.9: Rationale Blurbs
+
+Generate a 1-2 sentence `rationale` TLDR for each of the three main output sections. These give the user an at-a-glance explanation of *why* each conclusion was reached.
+
+1. **`virality.rationale`** — Explain the virality score by citing the strongest and weakest components. Example: "Scored 72 (strong) primarily due to an exceptional hook and strong trend alignment, held back by moderate shareability."
+
+2. **`authenticity.rationale`** — Explain the verdict by citing the most decisive signals. Example: "Classified as likely human based on high sentence-length variance and distinctive voice, despite slightly elevated transition word frequency."
+
+3. **`distribution.rationale`** — Explain the audience recommendation by citing the content characteristics that drive it. Example: "Best suited for Dev Twitter and Reddit/HN due to the technical subject matter and tutorial format, with strong LinkedIn crossover potential."
+
+**Tone**: Direct, specific, no hedging. Cite the actual scores or signals that drove the conclusion.
+
 ### Step 6: Reasoning Section
 
 #### Executive Summary
@@ -166,6 +178,7 @@ Before producing the final JSON, verify:
 - [ ] All disagreements >20 points are preserved
 - [ ] Authenticity section present with verdict, confidence, ai_probability, indicators, metrics, caveat
 - [ ] Authenticity scores are NOT factored into virality calculation
+- [ ] All three `rationale` blurbs present (virality, authenticity, distribution) — each 1-2 sentences
 - [ ] Metadata has mode, rounds, tokens, cost, judges, timestamp
 - [ ] `authenticity_analyst` is included in judges_used list
 - [ ] No null or missing required fields

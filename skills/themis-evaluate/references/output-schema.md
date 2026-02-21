@@ -27,7 +27,8 @@ All Themis evaluations produce output conforming to this schema. Judges produce 
       "trend_alignment": "integer 0-100",
       "shareability": "integer 0-100"
     },
-    "confidence": "float 0.0-1.0 — confidence in the overall score"
+    "confidence": "float 0.0-1.0 — confidence in the overall score",
+    "rationale": "string — 1-2 sentence TLDR explaining the virality score"
   },
 
   "distribution": {
@@ -54,7 +55,8 @@ All Themis evaluations produce output conforming to this schema. Judges produce 
       "cultural_barriers": ["string — barriers to cross-cultural spread"],
       "universal_themes": ["string — themes that transcend cultural boundaries"]
     },
-    "recommended_strategy": "string — 2-3 sentence distribution recommendation"
+    "recommended_strategy": "string — 2-3 sentence distribution recommendation",
+    "rationale": "string — 1-2 sentence TLDR explaining the distribution recommendation"
   },
 
   "reasoning": {
@@ -100,7 +102,8 @@ All Themis evaluations produce output conforming to this schema. Judges produce 
       "transition_frequency_per_1k": "float | null",
       "composite_statistical_probability": "float | null"
     },
-    "caveat": "string — mandatory disclaimer about AI detection limitations"
+    "caveat": "string — mandatory disclaimer about AI detection limitations",
+    "rationale": "string — 1-2 sentence TLDR explaining the authenticity verdict"
   },
 
   "metadata": {

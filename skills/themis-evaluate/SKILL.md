@@ -184,6 +184,7 @@ Use the themis-synthesizer skill. The synthesizer should:
 ## Themis Evaluation: <filename>
 
 **Virality: <score>/100 (<tier>)** | Confidence: <confidence>
+> <virality_rationale>
 
 ### Component Scores
 | Component | Score |
@@ -196,6 +197,7 @@ Use the themis-synthesizer skill. The synthesizer should:
 
 ### Authenticity Assessment
 **Verdict: <verdict>** | AI Probability: <ai_probability> | Confidence: <confidence>
+> <authenticity_rationale>
 <caveat>
 
 ### Executive Summary
@@ -210,6 +212,9 @@ Use the themis-synthesizer skill. The synthesizer should:
 1. <weakness>
 2. <weakness>
 3. <weakness>
+
+### Distribution
+> <distribution_rationale>
 
 ### Primary Audiences
 <for each audience — video content>
