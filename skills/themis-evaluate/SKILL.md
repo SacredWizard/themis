@@ -2,7 +2,7 @@
 name: themis-evaluate
 description: Main entry point for Themis evaluation. Orchestrates the full judge council pipeline to evaluate video ads and blog content for virality potential.
 user_invocable: true
-arguments: "<file_path> [--fast] [--whisper-model tiny|base|small|medium|large]"
+arguments: "file_path --fast --whisper-model"
 ---
 
 # Themis Evaluate
