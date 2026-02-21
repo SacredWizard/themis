@@ -78,6 +78,31 @@ All Themis evaluations produce output conforming to this schema. Judges produce 
     ]
   },
 
+  "authenticity": {
+    "verdict": "likely_human | likely_ai | mixed | uncertain",
+    "confidence": "float 0.0-1.0",
+    "ai_probability": "float 0.0-1.0",
+    "indicators": [
+      {
+        "type": "string — statistical | qualitative | structural | voice",
+        "signal": "string — description of what was detected",
+        "direction": "human | ai",
+        "weight": "low | medium | high"
+      }
+    ],
+    "statistical_metrics": {
+      "burstiness_score": "float | null",
+      "type_token_ratio": "float | null",
+      "hedging_frequency_per_1k": "float | null",
+      "sentence_initial_entropy": "float | null",
+      "paragraph_length_cv": "float | null",
+      "readability_variance": "float | null",
+      "transition_frequency_per_1k": "float | null",
+      "composite_statistical_probability": "float | null"
+    },
+    "caveat": "string — mandatory disclaimer about AI detection limitations"
+  },
+
   "metadata": {
     "mode": "full | fast",
     "debate_rounds": "integer",
@@ -133,6 +158,7 @@ Each judge produces a structured evaluation that feeds into the final output. Al
 | Trend Analyst | `trend_alignment` | trend_relevance, timing, cultural_moment, format_alignment |
 | Subject Analyst | (feeds audience mapper) | subject_clarity, theme_strength, niche_specificity |
 | Audience Mapper | `shareability` | community_fit, share_motivation, platform_optimization |
+| Authenticity Analyst | `authenticity` (separate from virality) | statistical_signal_strength, qualitative_signal_strength, voice_authenticity, structural_naturalness |
 
 ## Critic Output Schema
 
@@ -171,3 +197,13 @@ Each judge produces a structured evaluation that feeds into the final output. Al
 3. **Disagreements >20 points** between judges on the same dimension are preserved in `council_disagreements`, not averaged away
 4. **Critic adjustments** can shift scores by up to ±10 points with justification
 5. **Confidence** is the minimum of individual judge confidences, adjusted by critic
+
+## Authenticity Score Rules
+
+The `authenticity` section is a **separate, independent assessment** from the virality score:
+
+1. **Not a virality component**: Authenticity does NOT factor into the virality score calculation. The five virality components (hook_effectiveness, emotional_resonance, production_quality, trend_alignment, shareability) remain unchanged.
+2. **Separate output section**: The authenticity assessment appears as a peer of `virality` in the output, not nested within it.
+3. **Authenticity Analyst scores**: The Authenticity Analyst's `primary_score` = `round((1 - ai_probability) * 100)` — higher is more human (consistent with other judges where higher = better).
+4. **Mandatory caveat**: Every output must include the caveat string in the authenticity section.
+5. **Backward compatible**: Evaluations without authenticity data omit the `authenticity` section entirely. Existing consumers are unaffected.
