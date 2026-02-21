@@ -70,6 +70,8 @@ Plus: executive summary, strengths/weaknesses, improvement suggestions, council 
 - **Judges cannot hear audio.** Video judges infer music/audio context from transcript text and keyframe visuals. Actual audio signal analysis (song identification, trending sound detection) is deferred to a future phase.
 - **Authenticity is separate from virality.** The AI detection score does not factor into the virality calculation. They are independent assessments — content can score high on virality while being flagged as AI-generated.
 - **Short texts are unreliable.** Texts under 50 words get an `insufficient_text` flag with null metrics. The forensics are most reliable above 500 words.
+- **Input is local files only.** Themis currently accepts local video and text files. It does not accept URLs — fetching content from links (YouTube, blog URLs, social media posts) is not yet supported.
+- **Short-form video and text only.** The evaluation framework is tuned for short-form video ads (TikTok, Reels, Shorts) and blog-length text content. Long-form video, podcasts, or other formats are not currently supported.
 - **Cost estimates are approximations.** Token counts and costs are estimated based on typical content; actual costs vary with content length and image count.
 
 ## What I Would Improve With More Time
@@ -79,6 +81,10 @@ Plus: executive summary, strengths/weaknesses, improvement suggestions, council 
 - **Evaluation history and benchmarking:** Store past evaluations in a local database to enable trend analysis, comparative scoring, and calibration against real-world virality outcomes.
 - **A/B comparison mode:** Evaluate two pieces of content side-by-side with relative ranking and differential analysis.
 - **Custom scoring weights:** Let users override the default virality component weights (e.g., prioritize hook effectiveness at 40% for TikTok-first content).
+- **Music trend detection API:** Integrate a music trends API to score whether background audio uses currently viral sounds, trending songs, or rising audio memes — a major virality signal on TikTok and Reels.
+- **URL input support:** Accept links (YouTube, blog URLs, social media posts) and automatically fetch/extract the content for evaluation.
+- **Fact-checking / claim verification:** Integrate with fact-checking services (Snopes, ClaimBuster, or similar APIs) to flag potentially misleading claims in content.
+- **Multi-modal authenticity checks:** Extend AI detection beyond text to include visual artifact detection (AI-generated images/video), synthetic voice detection, and metadata forensics.
 - **MCP server migration:** Replace Python script Bash calls with a Model Context Protocol server for cleaner tool integration, streaming progress, and persistent state.
 
 ## Detailed Documentation
