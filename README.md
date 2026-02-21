@@ -64,4 +64,6 @@ VIDEO INPUT → Preprocessing (Haiku)
 
 ## License
 
-Proprietary
+Apache License 2.0 with Non-Commercial Restriction. See [LICENSE](LICENSE) for details.
+
+Free for personal, educational, and research use. Commercial use requires prior written permission.
