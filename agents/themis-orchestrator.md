@@ -29,12 +29,19 @@ You are the Themis Orchestrator. You manage the full evaluation pipeline for sho
 
 ### Step 1: Preprocessing
 
-For video input:
+Determine content type from file extension and run the appropriate preprocessor.
+
+For video input (`.mp4`, `.mov`, `.avi`, `.mkv`, `.webm`):
 ```bash
 python3 scripts/preprocess_video.py <video_path> -o /tmp/themis_payload.json
 ```
 
-For text input: Use the themis-preprocess skill (Phase 2).
+For text input (`.txt`, `.md`, `.html`):
+```bash
+python3 scripts/preprocess_text.py <text_path> -o /tmp/themis_payload.json
+```
+
+Text preprocessing requires no external dependencies (no FFmpeg or Whisper needed).
 
 ### Step 2: Format Judge Payloads
 
@@ -171,6 +178,28 @@ Track actual usage at each stage and report in metadata. Per-stage estimates:
 - Cross-council: ~5,000-10,000 tokens per council
 - Critic: ~10,000-15,000 tokens
 - Synthesis: ~10,000-15,000 tokens
+
+## Content Type Routing
+
+The orchestrator must adapt the pipeline based on `content_type` in the payload.
+
+### Video Content (`content_type: "video"`)
+- Full preprocessing: keyframe extraction + audio transcription
+- Judges receive keyframes according to their selection strategy
+- Platform fit scored as: TikTok, Reels, Shorts
+- Token budget is higher due to image tokens
+
+### Text Content (`content_type: "text"`)
+- Lightweight preprocessing: section extraction + metadata computation
+- No keyframes or images — all judges work from text only
+- Judges use their "## Text Evaluation" sections for adapted scoring criteria
+- Platform fit scored as: Blog/SEO, Newsletter, Social sharing
+- Token budget is significantly lower (~60-70% cheaper than video)
+- All image-related token optimization is N/A
+- Prompt caching is even more effective (text-only payloads cache better)
+
+### Routing Decision
+Check the `content_type` field in `/tmp/themis_payload.json` after preprocessing. The judge dispatch, debate protocol, and synthesis steps remain identical — judges internally adapt their evaluation criteria based on content type. No changes needed to the pipeline flow.
 
 ## Error Handling
 

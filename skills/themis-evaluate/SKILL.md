@@ -23,7 +23,7 @@ Evaluate short-form video ads or blog content for virality potential, audience d
 
 Confirm the file exists and determine content type:
 - Video: `.mp4`, `.mov`, `.avi`, `.mkv`, `.webm`
-- Text: `.txt`, `.md`, `.html` (Phase 2)
+- Text: `.txt`, `.md`, `.html`
 
 If the file doesn't exist or has an unsupported extension, stop and tell the user.
 
@@ -35,14 +35,23 @@ python3 scripts/check_dependencies.py
 
 If any dependency is missing, stop and show the user the install instructions.
 
+**Note:** For text content, FFmpeg and Whisper are not required. If only those dependencies are missing and the input is text, proceed anyway.
+
 ### 3. Preprocess
 
-For video:
+**For video:**
 ```bash
 python3 scripts/preprocess_video.py "<file_path>" -o /tmp/themis_payload.json --whisper-model <model>
 ```
 
 Default whisper model is `base`. Use `tiny` for faster processing, `large` for best transcription quality.
+
+**For text:**
+```bash
+python3 scripts/preprocess_text.py "<file_path>" -o /tmp/themis_payload.json
+```
+
+Text preprocessing extracts sections, computes metadata (word count, reading time), and converts HTML if needed. No external dependencies required.
 
 ### 4. Estimate Token Budget & Show Cost Preview
 
@@ -53,8 +62,15 @@ python3 scripts/token_tracker.py --mode <full|fast>
 ```
 
 Report the estimated cost to the user:
+
+**Video content:**
 - Full mode: Show token count + estimated cost (~$1.20-2.00)
 - Fast mode: Show token count + estimated cost (~$0.60-1.00)
+
+**Text content** (significantly cheaper — no image tokens):
+- Full mode: Show token count + estimated cost (~$0.30-0.60)
+- Fast mode: Show token count + estimated cost (~$0.15-0.30)
+
 - Show caching savings estimate
 
 Proceed after reporting.
@@ -181,8 +197,11 @@ Use the themis-synthesizer skill. The synthesizer should:
 3. <weakness>
 
 ### Primary Audiences
-<for each audience>
+<for each audience — video content>
 - **<community>** (relevance: <score>) — TikTok: <score> | Reels: <score> | Shorts: <score>
+  <reasoning>
+<for each audience — text content>
+- **<community>** (relevance: <score>) — Blog/SEO: <score> | Newsletter: <score> | Social: <score>
   <reasoning>
 
 ### Top Recommendations
