@@ -89,14 +89,15 @@ def format_all_judges(payload: dict, include_images: bool = True) -> dict[str, d
 
 
 def estimate_token_sizes(judge_payloads: dict[str, dict]) -> dict[str, int]:
-    """Rough estimate of token counts per judge payload."""
+    """Estimate token counts per judge payload."""
     estimates = {}
     for judge_name, payload in judge_payloads.items():
         # Text tokens: ~4 chars per token
         text_json = json.dumps({k: v for k, v in payload.items() if k != "keyframes"})
         text_tokens = len(text_json) // 4
 
-        # Image tokens: ~1600 tokens per image (typical for Claude vision)
+        # Image tokens: estimate based on resolution
+        # Claude vision: ~1600 tokens for standard images, varies with size
         image_count = sum(
             1 for f in payload.get("keyframes", []) if "base64" in f
         )
@@ -105,6 +106,24 @@ def estimate_token_sizes(judge_payloads: dict[str, dict]) -> dict[str, int]:
         estimates[judge_name] = text_tokens + image_tokens
 
     return estimates
+
+
+def estimate_shared_payload_tokens(payload: dict) -> dict:
+    """Estimate how many tokens are shared (cacheable) across judges."""
+    # Shared content: metadata + transcript (identical for all judges)
+    shared_json = json.dumps({
+        "source_file": payload.get("source_file", ""),
+        "content_type": payload.get("content_type", ""),
+        "metadata": payload.get("metadata", {}),
+        "transcript": payload.get("transcript", {}),
+    })
+    shared_text_tokens = len(shared_json) // 4
+
+    return {
+        "shared_text_tokens": shared_text_tokens,
+        "unique_per_judge": "keyframe images (varies by judge config)",
+        "cache_savings_note": "With prompt caching, shared tokens are charged at 10% after first judge",
+    }
 
 
 def main():
@@ -117,12 +136,38 @@ def main():
                         help="Strip base64 image data (text metadata only)")
     parser.add_argument("--estimate-tokens", action="store_true",
                         help="Print estimated token counts per judge")
+    parser.add_argument("--cache-analysis", action="store_true",
+                        help="Show prompt caching analysis for the payload")
     args = parser.parse_args()
 
     with open(args.payload) as f:
         payload = json.load(f)
 
-    if args.judge:
+    if args.cache_analysis:
+        shared = estimate_shared_payload_tokens(payload)
+        all_payloads = format_all_judges(payload, include_images=not args.no_images)
+        estimates = estimate_token_sizes(all_payloads)
+        total = sum(estimates.values())
+
+        print("Prompt Caching Analysis")
+        print("=" * 55)
+        print(f"  Shared text tokens (cacheable): {shared['shared_text_tokens']:>8,}")
+        print(f"  Total tokens across all judges: {total:>8,}")
+        print()
+        print("  Per-judge breakdown:")
+        for judge, tokens in sorted(estimates.items()):
+            config = JUDGE_KEYFRAME_CONFIGS.get(judge, {})
+            imgs = sum(1 for f in all_payloads.get(judge, {}).get("keyframes", []) if "base64" in f)
+            print(f"    {judge:25s}: {tokens:>7,} tokens ({imgs} images)")
+        print()
+        print("  Cache savings estimate:")
+        print(f"    Without caching: {total:>8,} input tokens total")
+        # 5 of 6 judges get cache hits on shared content
+        cacheable = shared["shared_text_tokens"] * 5
+        savings_tokens = int(cacheable * 0.9)  # 90% discount on cached
+        print(f"    Cacheable tokens: {cacheable:>7,} (shared text x 5 cache-hit judges)")
+        print(f"    Estimated savings: ~{savings_tokens:,} tokens worth of cost")
+    elif args.judge:
         result = format_for_judge(payload, args.judge, include_images=not args.no_images)
         print(json.dumps(result, indent=2))
     else:
