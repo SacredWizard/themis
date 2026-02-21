@@ -117,17 +117,60 @@ Invoke the themis-synthesizer skill with all data to produce the final JSON outp
 - Synthesis (Sonnet)
 - Estimated: ~130,000 tokens, $0.60-1.00
 
-## Token Tracking
+## Token Optimization
 
-Track token usage at each stage:
-- Preprocessing: minimal
+### Prompt Caching Strategy
+
+The payload (metadata + transcript) is shared across all 6 judges. To maximize cache hits:
+
+1. **Dispatch judges sequentially within the first batch** — the first judge call populates the cache, subsequent parallel calls hit it. In practice, launching all 6 in parallel still gets cache hits if the first call's prompt is cached before the others start processing.
+
+2. **Use consistent payload ordering** — always place the shared payload content (metadata, transcript) at the beginning of the prompt, before judge-specific instructions. Claude's prompt caching caches prefix matches.
+
+3. **Reuse payloads across rounds** — Round 2 prompts should start with the same payload prefix as Round 1, then append peer outputs. This lets the payload portion hit cache.
+
+Run cache analysis before dispatching:
+```bash
+python3 scripts/format_payload.py /tmp/themis_payload.json --cache-analysis
+```
+
+### Selective Keyframe Distribution
+
+Not all judges need all keyframes — this saves significant image tokens:
+
+| Judge | Keyframes | Rationale |
+|-------|-----------|-----------|
+| Hook Analyst | First 3-4 only | Only evaluates opening |
+| Emotion Analyst | All | Needs full emotional arc |
+| Production Analyst | All | Needs full visual sequence |
+| Trend Analyst | Sampled ~6 | Needs format sense, not every frame |
+| Subject Analyst | All | Needs complete subject detection |
+| Audience Mapper | Sampled ~6 | Needs visual signals, not every frame |
+| Critic | None | Evaluates reasoning, not content |
+| Orchestrator | None | Synthesizes judge outputs |
+
+Use `format_payload.py -j <judge_name>` to get the correct subset automatically.
+
+### Structured Output Enforcement
+
+All judge outputs must use the JSON schema from their SKILL.md. This:
+- Eliminates filler text (saves ~15-20% output tokens)
+- Makes parsing deterministic
+- Enables automated score extraction
+
+### Token Tracking
+
+Use `scripts/token_tracker.py` for pre-flight cost estimates:
+```bash
+python3 scripts/token_tracker.py --compare
+```
+
+Track actual usage at each stage and report in metadata. Per-stage estimates:
 - Per-judge Round 1: ~15,000-25,000 tokens each (with images)
 - Per-judge Round 2: ~10,000-15,000 tokens each
 - Cross-council: ~5,000-10,000 tokens per council
 - Critic: ~10,000-15,000 tokens
 - Synthesis: ~10,000-15,000 tokens
-
-Report totals in metadata.
 
 ## Error Handling
 

@@ -44,17 +44,36 @@ python3 scripts/preprocess_video.py "<file_path>" -o /tmp/themis_payload.json --
 
 Default whisper model is `base`. Use `tiny` for faster processing, `large` for best transcription quality.
 
-### 4. Estimate Token Budget
+### 4. Estimate Token Budget & Show Cost Preview
 
 ```bash
 python3 scripts/format_payload.py /tmp/themis_payload.json --estimate-tokens
+python3 scripts/format_payload.py /tmp/themis_payload.json --cache-analysis
+python3 scripts/token_tracker.py --mode <full|fast>
 ```
 
-Report the estimated token count to the user and proceed.
+Report the estimated cost to the user:
+- Full mode: Show token count + estimated cost (~$1.20-2.00)
+- Fast mode: Show token count + estimated cost (~$0.60-1.00)
+- Show caching savings estimate
+
+Proceed after reporting.
 
 ### 5. Run Judge Councils
 
 **Parse the mode** from arguments: `--fast` flag enables fast mode.
+
+#### Fast Mode Differences
+
+| Aspect | Full Mode | Fast Mode |
+|--------|-----------|-----------|
+| Debate rounds | 2 (independent + informed) | 1 (independent only) |
+| Cross-council exchange | Yes | Skipped |
+| Critic model | Opus | Sonnet |
+| Synthesis model | Opus | Sonnet |
+| Judge model | Sonnet | Sonnet |
+| Estimated tokens | ~230K-320K | ~130K-170K |
+| Estimated cost | $1.20-2.40 | $0.60-0.90 |
 
 #### Full Mode Pipeline
 
