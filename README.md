@@ -6,8 +6,9 @@ A multi-agent AI system that evaluates short-form video ads and blog content for
 
 Themis uses a **hierarchical sub-council debate architecture**:
 
-1. **6 specialist judges** organized into Content and Market councils evaluate independently
-2. **2 rounds of internal debate** force judges to defend reasoning and identify blind spots
+1. **7 specialist judges** organized into Content and Market councils evaluate independently
+2. **Statistical text forensics** detect AI-generated content
+3. **2 rounds of internal debate** force judges to defend reasoning and identify blind spots
 3. **Cross-council exchange** ensures holistic evaluation
 4. **Adversarial Critic** reviews for logical flaws and biases
 5. **Orchestrator** synthesizes final structured output
@@ -68,7 +69,7 @@ cd /path/to/your/project
 ```
 
 **What the install script does:**
-- Symlinks all 10 skill directories into `<target>/.claude/skills/`
+- Symlinks all 11 skill directories into `<target>/.claude/skills/`
 - Symlinks all 3 agent files into `<target>/.claude/agents/`
 - Runs the dependency checker
 
@@ -122,11 +123,14 @@ ls -la .claude/agents/ | grep themis
 ## Quick Start
 
 ```bash
-# Run full evaluation (in Claude Code)
+# Run full evaluation on a video (in Claude Code)
 /themis-evaluate path/to/video.mp4
 
 # Run fast evaluation (cheaper, single debate round)
 /themis-evaluate path/to/video.mp4 --fast
+
+# Evaluate a blog post or article
+/themis-evaluate path/to/article.txt
 
 # Use a specific Whisper model for better transcription
 /themis-evaluate path/to/video.mp4 --whisper-model small
@@ -173,7 +177,20 @@ python3 scripts/format_payload.py /tmp/test_payload.json --cache-analysis
 python3 scripts/token_tracker.py --compare
 ```
 
-### 4. Test Score Merging
+### 4. Test Text Preprocessing & Forensics
+
+```bash
+# Preprocess a text file
+python3 scripts/preprocess_text.py path/to/article.txt -o /tmp/test_text_payload.json
+
+# Run AI detection forensics
+python3 scripts/text_forensics.py /tmp/test_text_payload.json -o /tmp/test_forensics.json
+
+# Or analyze a text file directly
+python3 scripts/text_forensics.py --text-file path/to/article.txt
+```
+
+### 5. Test Score Merging
 
 ```bash
 # Simulate a full merge with sample council outputs
@@ -186,7 +203,7 @@ python3 scripts/merge_scores.py \
 
 Expected: virality score of 68/100, tier "strong", confidence 0.65.
 
-### 5. Test Full Pipeline (in Claude Code)
+### 6. Test Full Pipeline (in Claude Code)
 
 ```bash
 # Launch Claude Code with Themis loaded
@@ -198,15 +215,16 @@ claude --plugin-dir /path/to/themis
 
 This triggers the full pipeline:
 1. Dependency check
-2. Video preprocessing (keyframe extraction + transcription)
-3. Token budget estimation
-4. 6 judges evaluate in parallel (Round 1)
-5. Judges revise after seeing peers (Round 2)
-6. Cross-council exchange
-7. Critic adversarial review
-8. Final synthesis → JSON + narrative output
+2. Preprocessing (keyframes + transcription for video, section extraction for text)
+3. Text forensics (AI detection metrics)
+4. Token budget estimation
+5. 7 judges evaluate in parallel (Round 1)
+6. Judges revise after seeing peers (Round 2)
+7. Cross-council exchange
+8. Critic adversarial review
+9. Final synthesis → JSON + narrative output
 
-### 6. Test a Synthetic Video (No Real Content Needed)
+### 7. Test a Synthetic Video (No Real Content Needed)
 
 ```bash
 # Generate a 5-second test video with FFmpeg
@@ -230,6 +248,13 @@ python3 scripts/check_dependencies.py
 # Preprocess video (extract keyframes + transcribe)
 python3 scripts/preprocess_video.py video.mp4 -o payload.json --whisper-model base
 
+# Preprocess text (extract sections + metadata)
+python3 scripts/preprocess_text.py article.txt -o payload.json
+
+# Run AI detection forensics on a payload or text file
+python3 scripts/text_forensics.py payload.json -o forensics.json
+python3 scripts/text_forensics.py --text-file article.txt
+
 # Format payload for a specific judge
 python3 scripts/format_payload.py payload.json -j hook_analyst
 
@@ -249,8 +274,9 @@ python3 scripts/merge_scores.py --content-council cc.json --market-council mc.js
 ## Output
 
 Themis produces structured JSON with:
-- **Virality score** (0-100) with component breakdowns (hook, emotion, production, trend, shareability)
-- **Audience distribution** mapping to specific communities and platforms (TikTok, Reels, Shorts)
+- **Virality score** (0-100) with component breakdowns (hook, emotion, production, trend, shareability) and a TLDR rationale
+- **Authenticity verdict** (`likely_human`, `likely_ai`, `mixed`, `uncertain`) with statistical metrics and AI probability
+- **Audience distribution** mapping to specific communities and platforms (TikTok, Reels, Shorts for video; Blog, Twitter/X, LinkedIn, Newsletter, Reddit/HN for text)
 - **Strengths, weaknesses, and improvement suggestions** with expected impact ratings
 - **Council disagreements** preserved for transparency (>20-point spreads are never averaged away)
 - **Token usage and cost metadata**
@@ -259,29 +285,32 @@ Themis produces structured JSON with:
 
 | Mode | Debate Rounds | Cross-Council | Models | Est. Tokens | Est. Cost |
 |------|--------------|---------------|--------|-------------|-----------|
-| Full | 2 + cross-council | Yes | Haiku/Sonnet/Opus | ~230K-320K | $1.20-2.40 |
-| Fast | 1 only | No | Haiku/Sonnet | ~130K-170K | $0.60-0.90 |
+| Full | 2 + cross-council | Yes | Haiku/Sonnet/Opus | ~255K-350K | $1.40-2.60 |
+| Fast | 1 only | No | Haiku/Sonnet | ~145K-185K | $0.70-1.00 |
 
 ## Architecture
 
 ```
-VIDEO INPUT → Preprocessing (FFmpeg keyframes + Whisper transcription)
-            → Content Council (3 Sonnet judges, 2 debate rounds)
-            │   ├── Hook Analyst (first 3-sec effectiveness)
-            │   ├── Emotion/Storytelling Analyst (emotional arc, persuasion)
-            │   └── Production Quality Analyst (visual, pacing, audio, editing)
-            → Market Council (3 Sonnet judges, 2 debate rounds)
-            │   ├── Trend & Cultural Analyst (trend alignment, timing)
-            │   ├── Content Subject Analyst (subject/theme detection)
-            │   └── Audience Mapper (community mapping, distribution)
-            → Cross-council exchange (1 round)
-            → Critic review (Opus — adversarial logic check)
-            → Orchestrator synthesis (Opus — final JSON + narrative)
+INPUT (video or text)
+  → Preprocessing (FFmpeg + Whisper for video, section extraction for text)
+  → Text Forensics (statistical AI detection — pure Python)
+  → Content Council (4 Sonnet judges, 2 debate rounds)
+  │   ├── Hook Analyst (first 3-sec / headline effectiveness)
+  │   ├── Emotion/Storytelling Analyst (emotional arc, persuasion)
+  │   ├── Production Quality Analyst (visual, pacing, audio, editing)
+  │   └── Authenticity Analyst (AI detection — forensics + qualitative)
+  → Market Council (3 Sonnet judges, 2 debate rounds)
+  │   ├── Trend & Cultural Analyst (trend alignment, timing)
+  │   ├── Content Subject Analyst (subject/theme detection)
+  │   └── Audience Mapper (community mapping, distribution)
+  → Cross-council exchange (1 round)
+  → Critic review (Opus — adversarial logic check)
+  → Orchestrator synthesis (Opus — final JSON + narrative)
 ```
 
 ## Token Optimization
 
-- **Prompt caching**: Shared payload cached across 6 judges (~40-60% savings on shared content)
+- **Prompt caching**: Shared payload cached across 7 judges (~40-60% savings on shared content)
 - **Selective keyframe distribution**: Hook Analyst gets first 3-4 only; Critic gets none
 - **Structured output**: JSON schema enforcement eliminates filler text (~15-20% output savings)
 - **3-tier model allocation**: Haiku for preprocessing, Sonnet for judges, Opus for critic/synthesis
@@ -290,12 +319,13 @@ VIDEO INPUT → Preprocessing (FFmpeg keyframes + Whisper transcription)
 
 ```
 themis/
-├── .claude-plugin/plugin.json     # Plugin manifest
+├── .claude-plugin/plugin.json     # Plugin manifest (11 skills, 3 agents)
 ├── skills/
 │   ├── themis-evaluate/           # Main entry point + reference docs
 │   ├── themis-hook-analyst/       # Content Council: hook effectiveness
 │   ├── themis-emotion-analyst/    # Content Council: emotional arc
 │   ├── themis-production-analyst/ # Content Council: production quality
+│   ├── themis-authenticity-analyst/ # Content Council: AI detection
 │   ├── themis-trend-analyst/      # Market Council: trend alignment
 │   ├── themis-subject-analyst/    # Market Council: subject detection
 │   ├── themis-audience-mapper/    # Market Council: audience mapping
@@ -309,6 +339,8 @@ themis/
 ├── scripts/
 │   ├── check_dependencies.py      # Dependency validation
 │   ├── preprocess_video.py        # FFmpeg + Whisper pipeline
+│   ├── preprocess_text.py         # Text section extraction
+│   ├── text_forensics.py          # Statistical AI detection
 │   ├── format_payload.py          # Judge-specific payload formatting
 │   ├── merge_scores.py            # Score aggregation + cost estimation
 │   └── token_tracker.py           # Token budget + caching analysis
