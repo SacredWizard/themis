@@ -16,25 +16,209 @@ This multi-agent debate pattern produces higher-quality evaluations than single-
 
 ## Requirements
 
-- Python 3.10+
-- FFmpeg (for video keyframe extraction)
-- OpenAI Whisper (`pip install openai-whisper`) for transcription
-- Claude Code with plugin support
+- **Python 3.10+**
+- **FFmpeg** — for video keyframe extraction
+- **OpenAI Whisper** — for audio transcription
+- **Claude Code** v2.0+ — the CLI tool (`npm install -g @anthropic-ai/claude-code`)
+
+### Install Dependencies
+
+```bash
+# macOS
+brew install ffmpeg
+pip install openai-whisper
+
+# Ubuntu/Debian
+sudo apt install ffmpeg
+pip install openai-whisper
+
+# Verify everything is installed
+python3 scripts/check_dependencies.py
+```
+
+## Installation
+
+There are three ways to install Themis as a Claude Code plugin:
+
+### Option A: Plugin Directory (Recommended for Development)
+
+Load Themis directly when launching Claude Code — no installation needed:
+
+```bash
+claude --plugin-dir /path/to/themis
+```
+
+This loads all skills, agents, and hooks from the Themis directory for that session. Best for development and testing since changes are picked up immediately.
+
+### Option B: Install Script (Recommended for Regular Use)
+
+The install script symlinks Themis skills and agents into your Claude Code configuration:
+
+```bash
+# Clone the repo
+git clone git@github.com:SacredWizard/themis.git
+cd themis
+
+# Install into a specific project
+cd /path/to/your/project
+/path/to/themis/install.sh project
+
+# OR install globally (available in all projects)
+./install.sh user
+```
+
+**What the install script does:**
+- Symlinks all 10 skill directories into `<target>/.claude/skills/`
+- Symlinks all 3 agent files into `<target>/.claude/agents/`
+- Runs the dependency checker
+
+**Uninstall:**
+```bash
+cd /path/to/your/project
+/path/to/themis/uninstall.sh project
+
+# OR uninstall globally
+/path/to/themis/uninstall.sh user
+```
+
+### Option C: Manual Installation
+
+Copy or symlink the components yourself:
+
+```bash
+# For project-level installation
+PROJECT_DIR=/path/to/your/project
+THEMIS_DIR=/path/to/themis
+
+# Symlink skills
+mkdir -p "$PROJECT_DIR/.claude/skills"
+for skill in "$THEMIS_DIR"/skills/themis-*/; do
+    ln -s "$skill" "$PROJECT_DIR/.claude/skills/$(basename "$skill")"
+done
+
+# Symlink agents
+mkdir -p "$PROJECT_DIR/.claude/agents"
+for agent in "$THEMIS_DIR"/agents/themis-*.md; do
+    ln -s "$agent" "$PROJECT_DIR/.claude/agents/$(basename "$agent")"
+done
+```
+
+### Verify Installation
+
+After installing, launch Claude Code and check that the skills are discovered:
+
+```bash
+claude
+# Then type / and look for themis-evaluate in the skill list
+```
+
+You should see `/themis-evaluate` available. If not, check that the symlinks are correct:
+
+```bash
+ls -la .claude/skills/ | grep themis
+ls -la .claude/agents/ | grep themis
+```
 
 ## Quick Start
 
 ```bash
-# Verify dependencies
-python3 scripts/check_dependencies.py
-
-# Preprocess a video
-python3 scripts/preprocess_video.py path/to/video.mp4
-
 # Run full evaluation (in Claude Code)
 /themis-evaluate path/to/video.mp4
 
 # Run fast evaluation (cheaper, single debate round)
 /themis-evaluate path/to/video.mp4 --fast
+
+# Use a specific Whisper model for better transcription
+/themis-evaluate path/to/video.mp4 --whisper-model small
+```
+
+## Testing
+
+### 1. Test Dependencies
+
+```bash
+python3 scripts/check_dependencies.py
+```
+
+Expected output: all 4 checks should show `[OK]`.
+
+### 2. Test Video Preprocessing
+
+```bash
+# Preprocess a video (extract keyframes + transcribe audio)
+python3 scripts/preprocess_video.py path/to/video.mp4 -o /tmp/test_payload.json --whisper-model tiny
+
+# Verify the payload
+python3 -c "
+import json
+with open('/tmp/test_payload.json') as f:
+    p = json.load(f)
+print(f'Keyframes: {p[\"keyframe_count\"]}')
+print(f'Duration: {p[\"metadata\"][\"duration_sec\"]:.1f}s')
+print(f'Transcript: {len(p[\"transcript\"][\"text\"])} chars')
+print(f'Language: {p[\"transcript\"][\"language\"]}')
+"
+```
+
+### 3. Test Token Estimation
+
+```bash
+# Estimate per-judge token costs
+python3 scripts/format_payload.py /tmp/test_payload.json --estimate-tokens
+
+# See caching analysis
+python3 scripts/format_payload.py /tmp/test_payload.json --cache-analysis
+
+# Compare full vs fast mode costs
+python3 scripts/token_tracker.py --compare
+```
+
+### 4. Test Score Merging
+
+```bash
+# Simulate a full merge with sample council outputs
+python3 scripts/merge_scores.py \
+  --content-council '{"consensus_scores":{"hook_effectiveness":{"score":75,"confidence":0.8},"emotional_resonance":{"score":68,"confidence":0.75},"production_quality":{"score":72,"confidence":0.85}}}' \
+  --market-council '{"consensus_scores":{"trend_alignment":{"score":60,"confidence":0.7},"shareability":{"score":65,"confidence":0.72}}}' \
+  --critic '{"challenges":[],"cross_council_tensions":[],"overall_confidence_adjustment":-0.05}' \
+  --mode full --total-tokens 230000
+```
+
+Expected: virality score of 68/100, tier "strong", confidence 0.65.
+
+### 5. Test Full Pipeline (in Claude Code)
+
+```bash
+# Launch Claude Code with Themis loaded
+claude --plugin-dir /path/to/themis
+
+# Then run:
+/themis-evaluate path/to/video.mp4
+```
+
+This triggers the full pipeline:
+1. Dependency check
+2. Video preprocessing (keyframe extraction + transcription)
+3. Token budget estimation
+4. 6 judges evaluate in parallel (Round 1)
+5. Judges revise after seeing peers (Round 2)
+6. Cross-council exchange
+7. Critic adversarial review
+8. Final synthesis → JSON + narrative output
+
+### 6. Test a Synthetic Video (No Real Content Needed)
+
+```bash
+# Generate a 5-second test video with FFmpeg
+ffmpeg -y -f lavfi -i "testsrc2=duration=5:size=720x1280:rate=30" \
+  -f lavfi -i "sine=frequency=440:duration=5" \
+  -c:v libx264 -c:a aac -shortest test_video.mp4
+
+# Preprocess it
+python3 scripts/preprocess_video.py test_video.mp4 -o /tmp/test_payload.json --whisper-model tiny
+
+# Verify
+python3 scripts/format_payload.py /tmp/test_payload.json --estimate-tokens
 ```
 
 ## Utility Scripts
@@ -128,6 +312,8 @@ themis/
 │   ├── format_payload.py          # Judge-specific payload formatting
 │   ├── merge_scores.py            # Score aggregation + cost estimation
 │   └── token_tracker.py           # Token budget + caching analysis
+├── install.sh                     # Plugin installer
+├── uninstall.sh                   # Plugin uninstaller
 ├── hooks/hooks.json
 ├── CLAUDE.md
 └── README.md
