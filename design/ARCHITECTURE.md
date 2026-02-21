@@ -40,7 +40,7 @@ Themis is a multi-agent AI system built as a **Claude Code plugin** that evaluat
 flowchart TB
     subgraph Input["Input Layer"]
         V[/"Video File (.mp4, .mov, .avi, .mkv, .webm)"/]
-        T[/"Text File (.txt, .md, .html) — Phase 2"/]
+        T[/"Text File (.txt, .md, .html)"/]
     end
 
     subgraph Preprocess["Preprocessing Layer"]
@@ -79,7 +79,7 @@ flowchart TB
 
     V --> FF
     V --> WH
-    T -.->|Phase 2| PL
+    T --> PL
     FF --> PL
     WH --> PL
 
@@ -101,12 +101,12 @@ flowchart TB
 
     SY --> OUT
 
-    style Input fill:#e8f4f8,stroke:#2196F3
-    style Preprocess fill:#fff3e0,stroke:#FF9800
-    style Evaluation fill:#e8f5e9,stroke:#4CAF50
-    style QA fill:#fce4ec,stroke:#E91E63
-    style ForensicsLayer fill:#ede7f6,stroke:#673AB7
-    style Synthesis fill:#f3e5f5,stroke:#9C27B0
+    style Input fill:transparent,stroke:#2196F3,color:#000
+    style Preprocess fill:transparent,stroke:#FF9800,color:#000
+    style Evaluation fill:transparent,stroke:#4CAF50,color:#000
+    style QA fill:transparent,stroke:#E91E63,color:#000
+    style ForensicsLayer fill:transparent,stroke:#673AB7,color:#000
+    style Synthesis fill:transparent,stroke:#9C27B0,color:#000
 ```
 
 ### Component Map
@@ -120,6 +120,7 @@ graph LR
             S3["themis-hook-analyst"]
             S4["themis-emotion-analyst"]
             S5["themis-production-analyst"]
+            S5a["themis-authenticity-analyst"]
             S6["themis-trend-analyst"]
             S7["themis-subject-analyst"]
             S8["themis-audience-mapper"]
@@ -149,15 +150,15 @@ graph LR
     S1 --> A1
     A1 --> A2
     A1 --> A3
-    A2 --> S3 & S3a & S4 & S5
+    A2 --> S3 & S4 & S5 & S5a
     A3 --> S6 & S7 & S8
     A1 --> S9
     A1 --> S10
 
-    style Skills fill:#e3f2fd,stroke:#1976D2
-    style Agents fill:#e8f5e9,stroke:#388E3C
-    style Scripts fill:#fff8e1,stroke:#FFA000
-    style Refs fill:#f3e5f5,stroke:#7B1FA2
+    style Skills fill:transparent,stroke:#1976D2,color:#000
+    style Agents fill:transparent,stroke:#388E3C,color:#000
+    style Scripts fill:transparent,stroke:#FFA000,color:#000
+    style Refs fill:transparent,stroke:#7B1FA2,color:#000
 ```
 
 ---
@@ -202,10 +203,10 @@ graph TB
     MCL --> SA
     MCL --> AM
 
-    style ORCH fill:#ffecb3,stroke:#FF8F00,stroke-width:3px
-    style ContentCouncil fill:#c8e6c9,stroke:#2E7D32
-    style MarketCouncil fill:#bbdefb,stroke:#1565C0
-    style CrossCutting fill:#ffcdd2,stroke:#C62828
+    style ORCH fill:transparent,stroke:#FF8F00,stroke-width:3px,color:#000
+    style ContentCouncil fill:transparent,stroke:#2E7D32,color:#000
+    style MarketCouncil fill:transparent,stroke:#1565C0,color:#000
+    style CrossCutting fill:transparent,stroke:#C62828,color:#000
 ```
 
 ### Agent Roles & Responsibilities
@@ -448,9 +449,9 @@ graph LR
     CRA --> VS
     VS --> TIER
 
-    style Weights fill:#e8f5e9,stroke:#4CAF50
-    style Adjustments fill:#fff3e0,stroke:#FF9800
-    style Final fill:#f3e5f5,stroke:#9C27B0
+    style Weights fill:transparent,stroke:#4CAF50,color:#000
+    style Adjustments fill:transparent,stroke:#FF9800,color:#000
+    style Final fill:transparent,stroke:#9C27B0,color:#000
 ```
 
 ### Tier Thresholds
@@ -501,8 +502,8 @@ graph TB
     S3 --> FAST
     S4 --> FAST
 
-    style Strategies fill:#e3f2fd,stroke:#1565C0
-    style Impact fill:#e8f5e9,stroke:#2E7D32
+    style Strategies fill:transparent,stroke:#1565C0,color:#000
+    style Impact fill:transparent,stroke:#2E7D32,color:#000
 ```
 
 ### Prompt Caching
@@ -556,9 +557,9 @@ graph LR
     S3 --> O1
     O1 --> O2
 
-    style Haiku fill:#e0f7fa,stroke:#0097A7
-    style Sonnet fill:#e8f5e9,stroke:#388E3C
-    style Opus fill:#fff3e0,stroke:#F57C00
+    style Haiku fill:transparent,stroke:#0097A7,color:#000
+    style Sonnet fill:transparent,stroke:#388E3C,color:#000
+    style Opus fill:transparent,stroke:#F57C00,color:#000
 ```
 
 ---
@@ -606,10 +607,10 @@ graph TB
     PM --> SkillsDir
     PM --> AgentsDir
 
-    style PluginRoot fill:#fafafa,stroke:#424242
-    style SkillsDir fill:#e3f2fd,stroke:#1976D2
-    style AgentsDir fill:#e8f5e9,stroke:#388E3C
-    style ScriptsDir fill:#fff8e1,stroke:#FFA000
+    style PluginRoot fill:transparent,stroke:#424242,color:#000
+    style SkillsDir fill:transparent,stroke:#1976D2,color:#000
+    style AgentsDir fill:transparent,stroke:#388E3C,color:#000
+    style ScriptsDir fill:transparent,stroke:#FFA000,color:#000
 ```
 
 ### Installation Methods
@@ -765,10 +766,10 @@ flowchart TB
     META --> TP
     TP --> HA2 & EA2 & PA2 & TA2 & SA2 & AM2
 
-    style TextInput fill:#e8f4f8,stroke:#2196F3
-    style TextPreprocess fill:#fff3e0,stroke:#FF9800
-    style TextPayload fill:#e0f2f1,stroke:#00897B
-    style JudgeAdaptation fill:#e8f5e9,stroke:#4CAF50
+    style TextInput fill:transparent,stroke:#2196F3,color:#000
+    style TextPreprocess fill:transparent,stroke:#FF9800,color:#000
+    style TextPayload fill:transparent,stroke:#00897B,color:#000
+    style JudgeAdaptation fill:transparent,stroke:#4CAF50,color:#000
 ```
 
 ### Key Adaptations
@@ -835,9 +836,9 @@ flowchart TB
     VD --> CF
     VD --> CV
 
-    style Forensics fill:#e3f2fd,stroke:#1565C0
-    style Detection fill:#fce4ec,stroke:#C62828
-    style Output fill:#f3e5f5,stroke:#7B1FA2
+    style Forensics fill:transparent,stroke:#1565C0,color:#000
+    style Detection fill:transparent,stroke:#C62828,color:#000
+    style Output fill:transparent,stroke:#7B1FA2,color:#000
 ```
 
 ### Statistical Indicators
@@ -891,13 +892,15 @@ The `authenticity` section is a **peer of `virality`** in the output schema (not
 
 ### Short-Term (Post-Phase 3)
 
-1. **Persistent evaluation history**: Store past evaluations in a local database to enable trend analysis and comparative scoring across videos.
+1. **Background music / audio analysis (Phase 4)**: Integrate audio fingerprinting (AudD, ACRCloud, or Shazam API) to identify songs in video content, then cross-reference with Spotify/TikTok trending data to score music virality. Currently, judges reference music conceptually from transcript cues and keyframe context but cannot actually hear the audio. This would add a `music_virality` signal to the Trend Analyst and Production Analyst. Requires an external API key and per-evaluation cost. Video/audio forensics for AI detection (TTS patterns, synthetic voice detection) could also be bundled into this phase.
 
-2. **A/B comparison mode**: Evaluate two videos side-by-side with relative ranking and differential analysis.
+2. **Persistent evaluation history**: Store past evaluations in a local database to enable trend analysis and comparative scoring across videos.
 
-3. **Custom scoring weights**: Allow users to override the default component weights (e.g., prioritize hook effectiveness at 40% for TikTok-first content).
+3. **A/B comparison mode**: Evaluate two videos side-by-side with relative ranking and differential analysis.
 
-4. **Webhook/notification integration**: Send evaluation results to Slack, email, or other destinations upon completion.
+4. **Custom scoring weights**: Allow users to override the default component weights (e.g., prioritize hook effectiveness at 40% for TikTok-first content).
+
+5. **Webhook/notification integration**: Send evaluation results to Slack, email, or other destinations upon completion.
 
 ### Medium-Term
 
@@ -941,10 +944,10 @@ graph LR
 
     Phase1 --> Phase2 --> Current --> Beyond
 
-    style Phase1 fill:#c8e6c9,stroke:#2E7D32
-    style Phase2 fill:#c8e6c9,stroke:#2E7D32
-    style Current fill:#c8e6c9,stroke:#2E7D32,stroke-width:3px
-    style Beyond fill:#f3e5f5,stroke:#7B1FA2
+    style Phase1 fill:transparent,stroke:#2E7D32,color:#000
+    style Phase2 fill:transparent,stroke:#2E7D32,color:#000
+    style Current fill:transparent,stroke:#2E7D32,stroke-width:3px,color:#000
+    style Beyond fill:transparent,stroke:#7B1FA2,color:#000
 ```
 
 ---
