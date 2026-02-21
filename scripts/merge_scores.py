@@ -211,31 +211,48 @@ def merge_council_scores(
 
 
 def build_metadata(mode: str, debate_rounds: int, judges_used: list[str],
-                   total_tokens: int = 0) -> dict:
-    """Build the metadata section."""
-    # Cost estimation
-    # Rough: assume 60% input, 40% output tokens
-    # Sonnet: $3/$15 per MTok, Opus: $15/$75 per MTok
-    # Assume ~70% Sonnet, ~30% Opus usage
-    input_tokens = int(total_tokens * 0.6)
-    output_tokens = int(total_tokens * 0.4)
-    sonnet_fraction = 0.7
-    opus_fraction = 0.3
+                   total_tokens: int = 0, input_tokens: int = 0,
+                   output_tokens: int = 0, cache_hit_tokens: int = 0) -> dict:
+    """Build the metadata section with mode-aware cost estimation."""
+    # If only total_tokens provided, estimate input/output split
+    if total_tokens > 0 and input_tokens == 0:
+        input_tokens = int(total_tokens * 0.6)
+        output_tokens = int(total_tokens * 0.4)
 
-    sonnet_cost = (
-        (input_tokens * sonnet_fraction * 3 / 1_000_000) +
-        (output_tokens * sonnet_fraction * 15 / 1_000_000)
-    )
-    opus_cost = (
-        (input_tokens * opus_fraction * 15 / 1_000_000) +
-        (output_tokens * opus_fraction * 75 / 1_000_000)
-    )
+    # Mode-aware model mix
+    if mode == "fast":
+        # Fast mode: all Sonnet
+        sonnet_input = input_tokens - cache_hit_tokens
+        cache_cost = cache_hit_tokens * 3 * 0.10 / 1_000_000  # 90% discount
+        regular_cost = sonnet_input * 3 / 1_000_000
+        output_cost = output_tokens * 15 / 1_000_000
+        total_cost = cache_cost + regular_cost + output_cost
+    else:
+        # Full mode: ~70% Sonnet, ~30% Opus
+        sonnet_frac, opus_frac = 0.70, 0.30
+        non_cached = input_tokens - cache_hit_tokens
+        cache_cost = (
+            cache_hit_tokens * sonnet_frac * 3 * 0.10 / 1_000_000 +
+            cache_hit_tokens * opus_frac * 15 * 0.10 / 1_000_000
+        )
+        regular_cost = (
+            non_cached * sonnet_frac * 3 / 1_000_000 +
+            non_cached * opus_frac * 15 / 1_000_000
+        )
+        output_cost = (
+            output_tokens * sonnet_frac * 15 / 1_000_000 +
+            output_tokens * opus_frac * 75 / 1_000_000
+        )
+        total_cost = cache_cost + regular_cost + output_cost
 
     return {
         "mode": mode,
         "debate_rounds": debate_rounds,
-        "total_tokens_used": total_tokens,
-        "estimated_cost_usd": round(sonnet_cost + opus_cost, 2),
+        "total_tokens_used": input_tokens + output_tokens,
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "cache_hit_tokens": cache_hit_tokens,
+        "estimated_cost_usd": round(total_cost, 2),
         "judges_used": judges_used,
         "evaluation_timestamp": datetime.now(timezone.utc).isoformat(),
     }
