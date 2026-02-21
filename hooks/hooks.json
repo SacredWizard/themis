@@ -1,0 +1,10 @@
+{
+  "hooks": [
+    {
+      "event": "on_skill_invoke",
+      "matcher": "themis-evaluate",
+      "command": "python3 $PLUGIN_DIR/scripts/check_dependencies.py",
+      "description": "Verify FFmpeg, Whisper, and Python dependencies before running Themis evaluation"
+    }
+  ]
+}

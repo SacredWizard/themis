@@ -1,0 +1,24 @@
+{
+  "name": "themis",
+  "version": "1.0.0",
+  "description": "AI Judge Council for evaluating short-form video ads and blog content for virality potential, audience distribution, and content quality.",
+  "author": "Themis",
+  "skills": [
+    "skills/themis-evaluate",
+    "skills/themis-preprocess",
+    "skills/themis-hook-analyst",
+    "skills/themis-emotion-analyst",
+    "skills/themis-production-analyst",
+    "skills/themis-trend-analyst",
+    "skills/themis-subject-analyst",
+    "skills/themis-audience-mapper",
+    "skills/themis-critic",
+    "skills/themis-synthesizer"
+  ],
+  "agents": [
+    "agents/themis-orchestrator.md",
+    "agents/themis-content-council-lead.md",
+    "agents/themis-market-council-lead.md"
+  ],
+  "hooks": "hooks/hooks.json"
+}
