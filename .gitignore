@@ -12,3 +12,6 @@ payloads/
 dist/
 build/
 .env
+docs/
+sample-content/
+tests/
