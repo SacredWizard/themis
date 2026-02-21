@@ -4,6 +4,8 @@ Themis is a multi-agent AI evaluation system built as a Claude Code plugin. It t
 
 Under the hood, 7 specialist AI judges organized into Content and Market councils debate across multiple rounds, face adversarial review from a Critic, and are synthesized by an Orchestrator — producing higher-quality evaluations than single-pass analysis.
 
+![Themis Architecture](design/images/Simple_architecture.png)
+
 ## Setup
 
 **Requirements:** Python 3.10+, FFmpeg, OpenAI Whisper, Claude Code v2.0+
