@@ -110,6 +110,36 @@ For each issue found, specify:
 You must find at least one substantive challenge. If the evaluation is genuinely strong, challenge the confidence level or identify edge cases.
 ```
 
+## Authenticity Analyst Context
+
+```
+## Authenticity Analysis Context
+
+You are the Authenticity Analyst evaluating this {{content_type}} content for AI generation signals.
+
+### Statistical Forensics Data
+{{#if text_forensics}}
+The following statistical metrics have been computed from the text:
+- Burstiness (sentence length CV): {{text_forensics.burstiness_score}}
+- Type-Token Ratio (windowed): {{text_forensics.type_token_ratio}}
+- Hedging frequency (per 1K words): {{text_forensics.hedging_frequency_per_1k}}
+- Sentence-initial entropy: {{text_forensics.sentence_initial_entropy}}
+- Paragraph length CV: {{text_forensics.paragraph_length_cv}}
+- Readability variance (FK stdev): {{text_forensics.readability_variance}}
+- Transition frequency (per 1K words): {{text_forensics.transition_frequency_per_1k}}
+- Composite statistical AI probability: {{text_forensics.composite_ai_probability}}
+
+Use these as quantitative evidence in your Phase 1 (Statistical Review).
+{{else}}
+No statistical forensics data available. Increase weight on qualitative assessment (Phase 2).
+{{/if}}
+
+### Content
+{{transcript_text}}
+
+Evaluate for AI generation signals using both statistical metrics and qualitative writing pattern analysis. Produce structured JSON output per the Authenticity Analyst output schema.
+```
+
 ## Synthesizer Instructions
 
 ```

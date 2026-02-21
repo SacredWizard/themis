@@ -1,6 +1,6 @@
 # Themis: Architecture & Design Document
 
-> **Version:** 1.0.0 | **Last Updated:** 2026-02-20 | **Status:** Phase 1 Complete (Video Evaluation)
+> **Version:** 1.1.0 | **Last Updated:** 2026-02-20 | **Status:** Phase 3 Complete (AI Detection)
 
 ## TLDR
 
@@ -9,9 +9,9 @@ Themis is a multi-agent AI system built as a **Claude Code plugin** that evaluat
 **Why this architecture?** Single-pass LLM evaluation produces shallow, overconfident assessments. Multi-agent debate forces judges to defend reasoning, surfaces blind spots, and preserves genuine disagreements rather than averaging them away. The result is higher-quality, more nuanced evaluations with transparent reasoning chains.
 
 **Key numbers:**
-- 6 specialist judges + 1 critic + 1 orchestrator = 8 AI agents per evaluation
+- 7 specialist judges + 1 critic + 1 orchestrator = 9 AI agents per evaluation
 - 2 debate rounds + cross-council exchange + critic review = 4 layers of quality assurance
-- Full mode: ~320K tokens, ~$2.19 | Fast mode: ~170K tokens, ~$0.76
+- Full mode: ~350K tokens, ~$2.50 | Fast mode: ~185K tokens, ~$0.85
 - Prompt caching saves ~40-60% on shared payload tokens
 
 ---
@@ -54,6 +54,7 @@ flowchart TB
             HA["Hook Analyst"]
             EA["Emotion Analyst"]
             PA["Production Analyst"]
+            AA["Authenticity Analyst"]
         end
         subgraph MC["Market Council (Sonnet)"]
             TA["Trend Analyst"]
@@ -72,14 +73,19 @@ flowchart TB
         OUT[/"Final JSON + Narrative Report"/]
     end
 
+    subgraph ForensicsLayer["Text Forensics"]
+        TF["Text Forensics<br/>Statistical AI Detection"]
+    end
+
     V --> FF
     V --> WH
     T -.->|Phase 2| PL
     FF --> PL
     WH --> PL
 
-    PL --> CC
-    PL --> MC
+    PL --> TF
+    TF --> CC
+    TF --> MC
 
     CC --> XC
     MC --> XC
@@ -99,6 +105,7 @@ flowchart TB
     style Preprocess fill:#fff3e0,stroke:#FF9800
     style Evaluation fill:#e8f5e9,stroke:#4CAF50
     style QA fill:#fce4ec,stroke:#E91E63
+    style ForensicsLayer fill:#ede7f6,stroke:#673AB7
     style Synthesis fill:#f3e5f5,stroke:#9C27B0
 ```
 
@@ -130,6 +137,7 @@ graph LR
             P3["format_payload.py"]
             P4["merge_scores.py"]
             P5["token_tracker.py"]
+            P6["text_forensics.py"]
         end
         subgraph Refs["Reference Docs"]
             R1["output-schema.md"]
@@ -141,7 +149,7 @@ graph LR
     S1 --> A1
     A1 --> A2
     A1 --> A3
-    A2 --> S3 & S4 & S5
+    A2 --> S3 & S3a & S4 & S5
     A3 --> S6 & S7 & S8
     A1 --> S9
     A1 --> S10
@@ -167,6 +175,7 @@ graph TB
         HA["Hook Analyst<br/>(Sonnet)<br/><i>First 3-sec effectiveness</i>"]
         EA["Emotion Analyst<br/>(Sonnet)<br/><i>Emotional arc, persuasion</i>"]
         PA["Production Analyst<br/>(Sonnet)<br/><i>Visual, pacing, audio, editing</i>"]
+        AuthA["Authenticity Analyst<br/>(Sonnet)<br/><i>AI content detection</i>"]
     end
 
     subgraph MarketCouncil["Market Council"]
@@ -187,6 +196,7 @@ graph TB
     CCL --> HA
     CCL --> EA
     CCL --> PA
+    CCL --> AuthA
 
     MCL --> TA
     MCL --> SA
@@ -205,6 +215,7 @@ graph TB
 | Hook Analyst | Sonnet | Content | `hook_effectiveness` | First 3-4 only |
 | Emotion Analyst | Sonnet | Content | `emotional_resonance` | All |
 | Production Analyst | Sonnet | Content | `production_quality` | All |
+| Authenticity Analyst | Sonnet | Content | `authenticity` (separate) | None |
 | Trend Analyst | Sonnet | Market | `trend_alignment` | Sampled ~6 |
 | Subject Analyst | Sonnet | Market | *(feeds Audience Mapper)* | All |
 | Audience Mapper | Sonnet | Market | `shareability` | Sampled ~6 |
@@ -330,8 +341,8 @@ sequenceDiagram
 | Critic model | Opus | Sonnet |
 | Synthesis model | Opus | Sonnet |
 | Judge model | Sonnet | Sonnet |
-| Estimated tokens | ~230K-320K | ~130K-170K |
-| Estimated cost | $1.20-2.40 | $0.60-0.90 |
+| Estimated tokens | ~255K-350K | ~145K-185K |
+| Estimated cost | $1.40-2.60 | $0.70-1.00 |
 | Quality | Highest (multi-layer QA) | Good (single-pass + critic) |
 
 ---
@@ -516,6 +527,7 @@ The payload (metadata + transcript) is shared across all 6 judges. By placing sh
 | Trend Analyst | ~6 sampled | `sampled` | Needs format sense, not every frame |
 | Subject Analyst | All | `all` | Complete subject detection |
 | Audience Mapper | ~6 sampled | `sampled` | Visual signals, not every frame |
+| Authenticity Analyst | None | `none` | Text/transcript + forensics only |
 | Critic | None | `none` | Evaluates reasoning, not content |
 | Orchestrator | None | `none` | Synthesizes judge outputs |
 
@@ -558,7 +570,7 @@ graph LR
 ```mermaid
 graph TB
     subgraph PluginRoot["themis/ (Plugin Root)"]
-        PM["plugin.json<br/><i>Manifest: 10 skills, 3 agents</i>"]
+        PM["plugin.json<br/><i>Manifest: 11 skills, 3 agents</i>"]
 
         subgraph SkillsDir["skills/"]
             direction TB
@@ -567,6 +579,7 @@ graph TB
             SJ1["themis-hook-analyst/SKILL.md"]
             SJ2["themis-emotion-analyst/SKILL.md"]
             SJ3["themis-production-analyst/SKILL.md"]
+            SJ3a["themis-authenticity-analyst/SKILL.md"]
             SJ4["themis-trend-analyst/SKILL.md"]
             SJ5["themis-subject-analyst/SKILL.md"]
             SJ6["themis-audience-mapper/SKILL.md"]
@@ -586,6 +599,7 @@ graph TB
             P3["format_payload.py"]
             P4["merge_scores.py"]
             P5["token_tracker.py"]
+            P6["text_forensics.py"]
         end
     end
 
@@ -778,78 +792,95 @@ Text evaluations are significantly cheaper than video:
 
 ---
 
-## 10. Phase 3: AI Detection
+## 10. Phase 3: AI Detection (Complete)
 
 ### Overview
 
-Add an Authenticity Analyst judge that detects AI-generated content using statistical text forensics and visual artifact analysis.
+The Authenticity Analyst judge detects AI-generated content using a hybrid approach: pure-Python statistical text forensics (`scripts/text_forensics.py`) combined with Claude's qualitative writing pattern assessment via the Authenticity Analyst judge skill.
+
+**Key design decisions:**
+- Authenticity is a **separate score** from virality (not a weighted component) — backward compatible
+- Authenticity Analyst joins the **Content Council** as 4th judge — participates in debate rounds
+- Forensics scope is **text-only** — video/audio forensics deferred to future phases
+- No heavy ML dependencies — pure Python standard library only
 
 ```mermaid
 flowchart TB
-    subgraph Forensics["Statistical Text Forensics"]
-        PP["Perplexity Scoring<br/><i>Low perplexity → likely AI</i>"]
-        BB["Burstiness Analysis<br/><i>Low variance → likely AI</i>"]
-        TTR["Type-Token Ratio<br/><i>Vocabulary diversity</i>"]
-        SLD["Sentence Length Distribution<br/><i>Standard deviation analysis</i>"]
+    subgraph Forensics["Statistical Text Forensics (Pure Python)"]
+        BB["Burstiness Analysis<br/><i>Sentence length CV</i>"]
+        TTR["Type-Token Ratio<br/><i>Windowed vocabulary diversity</i>"]
+        HF["Hedging Frequency<br/><i>LLM phrases per 1K words</i>"]
+        SIE["Sentence-Initial Entropy<br/><i>Diversity of sentence starts</i>"]
+        PCV["Paragraph Length CV<br/><i>Structure uniformity</i>"]
+        RV["Readability Variance<br/><i>FK grade stdev across paragraphs</i>"]
+        TF["Transition Frequency<br/><i>Formal connectors per 1K words</i>"]
     end
 
-    subgraph Visual["Visual Forensics (Video)"]
-        VA["Visual Artifact Detection<br/><i>AI generation artifacts</i>"]
-        AC["Audio Cadence Analysis<br/><i>TTS patterns, unnatural rhythm</i>"]
-        MF["Metadata Forensics<br/><i>Generation tool signatures</i>"]
-    end
-
-    subgraph Detection["Authenticity Analyst"]
-        AA["Authenticity Analyst<br/>(Cross-cutting judge)"]
+    subgraph Detection["Authenticity Analyst (Content Council)"]
+        P1["Phase 1: Statistical Review<br/><i>Map metrics to expected ranges</i>"]
+        P2["Phase 2: Qualitative Assessment<br/><i>LLM-isms, voice, structure</i>"]
     end
 
     subgraph Output["Detection Output"]
-        VD["Verdict<br/><i>likely_human | likely_ai | uncertain</i>"]
+        VD["Verdict<br/><i>likely_human | likely_ai | mixed | uncertain</i>"]
+        SC["Scores<br/><i>statistical, qualitative, voice, structural</i>"]
         CF["Confidence + Indicators"]
         CV["Mandatory Caveat<br/><i>Detection limitations disclaimer</i>"]
     end
 
-    Forensics --> AA
-    Visual --> AA
-    AA --> VD
-    AA --> CF
-    AA --> CV
+    Forensics --> P1
+    P1 --> VD
+    P2 --> VD
+    VD --> SC
+    VD --> CF
+    VD --> CV
 
     style Forensics fill:#e3f2fd,stroke:#1565C0
-    style Visual fill:#fff3e0,stroke:#F57C00
     style Detection fill:#fce4ec,stroke:#C62828
     style Output fill:#f3e5f5,stroke:#7B1FA2
 ```
 
 ### Statistical Indicators
 
-| Metric | Human Content | AI Content |
-|--------|--------------|------------|
-| Perplexity | Higher, more variable | Lower, more uniform |
-| Burstiness | High variance in sentence length | Low variance (uniform length) |
-| Type-Token Ratio | Moderate, with slang/jargon | Higher, more "proper" vocabulary |
-| Hedging frequency | Variable | Often elevated |
+| Metric | Human Content | AI Content | Weight |
+|--------|--------------|------------|--------|
+| Burstiness (CV) | 0.5-1.0+ | 0.15-0.35 | 15% |
+| Type-Token Ratio | 0.4-0.65 | 0.6-0.8+ | 10% |
+| Hedging frequency (per 1K) | 0-3 | 5-15+ | 20% |
+| Sentence-initial entropy | 0.7-0.95 | 0.4-0.65 | 15% |
+| Paragraph length CV | 0.4-0.8+ | 0.1-0.3 | 10% |
+| Readability variance (FK stdev) | 2.0-5.0+ | 0.5-1.5 | 15% |
+| Transition frequency (per 1K) | 2-8 | 10-20+ | 15% |
 
 ### Output Schema Extension
+
+The `authenticity` section is a **peer of `virality`** in the output schema (not nested within it):
 
 ```json
 {
   "authenticity": {
-    "verdict": "likely_human | likely_ai | uncertain",
-    "confidence": 0.0-1.0,
+    "verdict": "likely_human | likely_ai | mixed | uncertain",
+    "confidence": 0.0,
+    "ai_probability": 0.0,
     "indicators": [
       {
-        "type": "perplexity | burstiness | ttr | stylistic | visual | audio",
-        "signal": "description of the signal detected",
-        "weight": "how heavily this factored into the verdict"
+        "type": "statistical | qualitative | structural | voice",
+        "signal": "description of what was detected",
+        "direction": "human | ai",
+        "weight": "low | medium | high"
       }
     ],
     "statistical_metrics": {
-      "perplexity_score": "float",
       "burstiness_score": "float",
-      "type_token_ratio": "float"
+      "type_token_ratio": "float",
+      "hedging_frequency_per_1k": "float",
+      "sentence_initial_entropy": "float",
+      "paragraph_length_cv": "float",
+      "readability_variance": "float",
+      "transition_frequency_per_1k": "float",
+      "composite_statistical_probability": "float"
     },
-    "caveat": "AI detection is inherently uncertain. This assessment is probabilistic, not definitive."
+    "caveat": "AI detection is inherently uncertain..."
   }
 }
 ```
@@ -892,15 +923,15 @@ flowchart TB
 
 ```mermaid
 graph LR
-    subgraph Current["Phase 1 (Current)"]
+    subgraph Phase1["Phase 1 (Complete)"]
         V1["Video evaluation<br/>6 judges + critic<br/>Full/Fast modes"]
     end
 
-    subgraph Phase2["Phase 2"]
+    subgraph Phase2["Phase 2 (Complete)"]
         V2["+ Text evaluation<br/>Adapted judge frameworks<br/>Content-type routing"]
     end
 
-    subgraph Phase3["Phase 3"]
+    subgraph Current["Phase 3 (Current)"]
         V3["+ AI detection<br/>Authenticity Analyst<br/>Statistical forensics"]
     end
 
@@ -908,11 +939,11 @@ graph LR
         V4["A/B comparison<br/>Batch mode<br/>MCP server<br/>Platform-specific models<br/>Real-time evaluation"]
     end
 
-    Current --> Phase2 --> Phase3 --> Beyond
+    Phase1 --> Phase2 --> Current --> Beyond
 
+    style Phase1 fill:#c8e6c9,stroke:#2E7D32
+    style Phase2 fill:#c8e6c9,stroke:#2E7D32
     style Current fill:#c8e6c9,stroke:#2E7D32,stroke-width:3px
-    style Phase2 fill:#bbdefb,stroke:#1565C0
-    style Phase3 fill:#ffecb3,stroke:#FF8F00
     style Beyond fill:#f3e5f5,stroke:#7B1FA2
 ```
 
@@ -922,7 +953,7 @@ graph LR
 
 | File | Purpose |
 |------|---------|
-| `.claude-plugin/plugin.json` | Plugin manifest (10 skills, 3 agents) |
+| `.claude-plugin/plugin.json` | Plugin manifest (11 skills, 3 agents) |
 | `skills/themis-evaluate/SKILL.md` | Main entry point — 8-step pipeline definition |
 | `skills/themis-evaluate/references/output-schema.md` | JSON output schema v1.0 |
 | `skills/themis-evaluate/references/debate-protocol.md` | Debate rounds, consensus mechanism, anti-patterns |
@@ -933,7 +964,8 @@ graph LR
 | `skills/themis-trend-analyst/SKILL.md` | Trend alignment and cultural moment detection |
 | `skills/themis-subject-analyst/SKILL.md` | Subject/theme/object detection and classification |
 | `skills/themis-audience-mapper/SKILL.md` | Community mapping and platform distribution |
-| `skills/themis-critic/SKILL.md` | Adversarial review (5 challenge categories) |
+| `skills/themis-authenticity-analyst/SKILL.md` | AI content detection (statistical + qualitative) |
+| `skills/themis-critic/SKILL.md` | Adversarial review (6 challenge categories) |
 | `skills/themis-synthesizer/SKILL.md` | Final synthesis and score computation |
 | `skills/themis-preprocess/SKILL.md` | Video preprocessing documentation |
 | `agents/themis-orchestrator.md` | Opus agent — full pipeline management |
@@ -944,5 +976,6 @@ graph LR
 | `scripts/format_payload.py` | Judge-specific payload formatting + token estimation |
 | `scripts/merge_scores.py` | Confidence-weighted score aggregation |
 | `scripts/token_tracker.py` | Per-stage token tracking + cost estimation |
+| `scripts/text_forensics.py` | Statistical text forensics for AI detection |
 | `install.sh` | Symlink-based plugin installer (project/user scope) |
 | `uninstall.sh` | Plugin uninstaller |

@@ -10,6 +10,9 @@ The debate protocol structures how 6 specialist judges evaluate content through 
 - **Hook Analyst** — First 3 seconds / opening effectiveness
 - **Emotion/Storytelling Analyst** — Emotional arc, persuasion, narrative
 - **Production Quality Analyst** — Visual quality, pacing, audio, editing
+- **Authenticity Analyst** — AI content detection (statistical forensics + qualitative analysis)
+
+**Note:** The Authenticity Analyst participates in debate rounds but its scores do NOT contribute to the virality consensus. Its output is passed through as a separate `authenticity` section in the final output.
 
 ### Market Council
 - **Trend & Cultural Analyst** — Trend alignment, cultural moments, timing
