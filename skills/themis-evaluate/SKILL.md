@@ -53,6 +53,16 @@ python3 scripts/preprocess_text.py "<file_path>" -o /tmp/themis_payload.json
 
 Text preprocessing extracts sections, computes metadata (word count, reading time), and converts HTML if needed. No external dependencies required.
 
+### 3.5. Run Text Forensics
+
+Run statistical text forensics on the payload (works for both video transcripts and text content):
+
+```bash
+python3 scripts/text_forensics.py /tmp/themis_payload.json -o /tmp/themis_forensics.json
+```
+
+Read the forensics output and inject it as a `text_forensics` key in the payload JSON before formatting for judges. This data feeds the Authenticity Analyst's statistical review phase.
+
 ### 4. Estimate Token Budget & Show Cost Preview
 
 ```bash
@@ -88,8 +98,8 @@ Proceed after reporting.
 | Critic model | Opus | Sonnet |
 | Synthesis model | Opus | Sonnet |
 | Judge model | Sonnet | Sonnet |
-| Estimated tokens | ~230K-320K | ~130K-170K |
-| Estimated cost | $1.20-2.40 | $0.60-0.90 |
+| Estimated tokens | ~255K-350K | ~145K-185K |
+| Estimated cost | $1.40-2.60 | $0.70-1.00 |
 
 #### Full Mode Pipeline
 
@@ -108,6 +118,7 @@ Content Council judges (use `model: sonnet` for Task tool):
 - **Hook Analyst**: `python3 scripts/format_payload.py /tmp/themis_payload.json -j hook_analyst`
 - **Emotion Analyst**: `python3 scripts/format_payload.py /tmp/themis_payload.json -j emotion_analyst`
 - **Production Analyst**: `python3 scripts/format_payload.py /tmp/themis_payload.json -j production_analyst`
+- **Authenticity Analyst**: `python3 scripts/format_payload.py /tmp/themis_payload.json -j authenticity_analyst`
 
 Market Council judges (use `model: sonnet` for Task tool):
 - **Trend Analyst**: `python3 scripts/format_payload.py /tmp/themis_payload.json -j trend_analyst`
@@ -182,6 +193,10 @@ Use the themis-synthesizer skill. The synthesizer should:
 | Production Quality | <score>/100 |
 | Trend Alignment | <score>/100 |
 | Shareability | <score>/100 |
+
+### Authenticity Assessment
+**Verdict: <verdict>** | AI Probability: <ai_probability> | Confidence: <confidence>
+<caveat>
 
 ### Executive Summary
 <executive_summary>

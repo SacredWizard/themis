@@ -23,15 +23,18 @@ STAGE_MODELS = {
     # Full mode
     "full": {
         "preprocess": "haiku",
+        "text_forensics": "none",
         "hook_analyst_r1": "sonnet",
         "emotion_analyst_r1": "sonnet",
         "production_analyst_r1": "sonnet",
+        "authenticity_analyst_r1": "sonnet",
         "trend_analyst_r1": "sonnet",
         "subject_analyst_r1": "sonnet",
         "audience_mapper_r1": "sonnet",
         "hook_analyst_r2": "sonnet",
         "emotion_analyst_r2": "sonnet",
         "production_analyst_r2": "sonnet",
+        "authenticity_analyst_r2": "sonnet",
         "trend_analyst_r2": "sonnet",
         "subject_analyst_r2": "sonnet",
         "audience_mapper_r2": "sonnet",
@@ -45,9 +48,11 @@ STAGE_MODELS = {
     # Fast mode — all Sonnet, no Round 2 or cross-council
     "fast": {
         "preprocess": "haiku",
+        "text_forensics": "none",
         "hook_analyst_r1": "sonnet",
         "emotion_analyst_r1": "sonnet",
         "production_analyst_r1": "sonnet",
+        "authenticity_analyst_r1": "sonnet",
         "trend_analyst_r1": "sonnet",
         "subject_analyst_r1": "sonnet",
         "audience_mapper_r1": "sonnet",
@@ -62,15 +67,18 @@ STAGE_MODELS = {
 STAGE_TOKEN_ESTIMATES = {
     "full": {
         "preprocess": {"input": 500, "output": 200},
+        "text_forensics": {"input": 0, "output": 0},
         "hook_analyst_r1": {"input": 12000, "output": 3000},
         "emotion_analyst_r1": {"input": 20000, "output": 3000},
         "production_analyst_r1": {"input": 20000, "output": 3000},
+        "authenticity_analyst_r1": {"input": 10000, "output": 3000},
         "trend_analyst_r1": {"input": 14000, "output": 3000},
         "subject_analyst_r1": {"input": 20000, "output": 4000},
         "audience_mapper_r1": {"input": 14000, "output": 4000},
         "hook_analyst_r2": {"input": 15000, "output": 2000},
         "emotion_analyst_r2": {"input": 23000, "output": 2000},
         "production_analyst_r2": {"input": 23000, "output": 2000},
+        "authenticity_analyst_r2": {"input": 13000, "output": 2000},
         "trend_analyst_r2": {"input": 17000, "output": 2000},
         "subject_analyst_r2": {"input": 23000, "output": 2000},
         "audience_mapper_r2": {"input": 17000, "output": 2000},
@@ -83,9 +91,11 @@ STAGE_TOKEN_ESTIMATES = {
     },
     "fast": {
         "preprocess": {"input": 500, "output": 200},
+        "text_forensics": {"input": 0, "output": 0},
         "hook_analyst_r1": {"input": 12000, "output": 3000},
         "emotion_analyst_r1": {"input": 20000, "output": 3000},
         "production_analyst_r1": {"input": 20000, "output": 3000},
+        "authenticity_analyst_r1": {"input": 10000, "output": 3000},
         "trend_analyst_r1": {"input": 14000, "output": 3000},
         "subject_analyst_r1": {"input": 20000, "output": 4000},
         "audience_mapper_r1": {"input": 14000, "output": 4000},
@@ -162,6 +172,13 @@ class TokenTracker:
             out = data["output_tokens"]
             cache = data.get("cache_hit_tokens", 0)
             model = data["model"]
+            if model == "none":
+                # Local script, no API call — zero cost
+                stage_details[stage] = {
+                    "input": 0, "output": 0, "cache_hits": 0,
+                    "model": "none", "cost_usd": 0.0,
+                }
+                continue
             pricing = MODEL_PRICING.get(model, MODEL_PRICING["sonnet"])
 
             # Non-cached input tokens pay full price

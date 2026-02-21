@@ -20,6 +20,7 @@ JUDGE_KEYFRAME_CONFIGS = {
     "trend_analyst": {"strategy": "sampled", "n": 6},
     "subject_analyst": {"strategy": "all"},
     "audience_mapper": {"strategy": "sampled", "n": 6},
+    "authenticity_analyst": {"strategy": "none"},
     "critic": {"strategy": "none"},
     "orchestrator": {"strategy": "none"},
 }
@@ -70,6 +71,10 @@ def format_for_judge(payload: dict, judge_name: str,
         "keyframe_count_provided": len(selected),
         "keyframe_selection_strategy": config["strategy"],
     }
+
+    # Pass through text_forensics data if present in payload
+    if "text_forensics" in payload:
+        judge_payload["text_forensics"] = payload["text_forensics"]
 
     if content_type == "text":
         # Text payloads have no images; include sections instead

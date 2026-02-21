@@ -43,6 +43,16 @@ python3 scripts/preprocess_text.py <text_path> -o /tmp/themis_payload.json
 
 Text preprocessing requires no external dependencies (no FFmpeg or Whisper needed).
 
+### Step 1.5: Text Forensics
+
+Run statistical text forensics on the payload (works for both video transcripts and text content):
+
+```bash
+python3 scripts/text_forensics.py /tmp/themis_payload.json -o /tmp/themis_forensics.json
+```
+
+Then inject the forensics data into the payload for downstream consumption. Read the forensics output and add it as a `text_forensics` key in the payload JSON before formatting for judges.
+
 ### Step 2: Format Judge Payloads
 
 ```bash
@@ -53,10 +63,11 @@ This tells you the token budget. Proceed if within limits.
 
 ### Step 3: Content Council (Parallel)
 
-Dispatch all 3 Content Council judges in parallel using the Task tool:
+Dispatch all 4 Content Council judges in parallel using the Task tool:
 - **themis-hook-analyst** — receives first 3-4 keyframes only
 - **themis-emotion-analyst** — receives all keyframes
 - **themis-production-analyst** — receives all keyframes
+- **themis-authenticity-analyst** — receives no keyframes (text/transcript + forensics only)
 
 Each judge uses the Skill tool to load their evaluation framework, then evaluates the payload.
 
@@ -115,14 +126,14 @@ Invoke the themis-synthesizer skill with all data to produce the final JSON outp
 - Cross-council exchange
 - Critic review (Opus)
 - Orchestrator synthesis (Opus)
-- Estimated: ~230,000 tokens, $1.20-2.00
+- Estimated: ~260,000 tokens, $1.40-2.30
 
 ### Fast Mode
 - 1 debate round only (skip Round 2)
 - Skip cross-council exchange
 - Critic review (Sonnet)
 - Synthesis (Sonnet)
-- Estimated: ~130,000 tokens, $0.60-1.00
+- Estimated: ~145,000 tokens, $0.70-1.10
 
 ## Token Optimization
 
@@ -153,6 +164,7 @@ Not all judges need all keyframes — this saves significant image tokens:
 | Trend Analyst | Sampled ~6 | Needs format sense, not every frame |
 | Subject Analyst | All | Needs complete subject detection |
 | Audience Mapper | Sampled ~6 | Needs visual signals, not every frame |
+| Authenticity Analyst | None | Text/transcript + forensics only |
 | Critic | None | Evaluates reasoning, not content |
 | Orchestrator | None | Synthesizes judge outputs |
 
@@ -200,6 +212,8 @@ The orchestrator must adapt the pipeline based on `content_type` in the payload.
 
 ### Routing Decision
 Check the `content_type` field in `/tmp/themis_payload.json` after preprocessing. The judge dispatch, debate protocol, and synthesis steps remain identical — judges internally adapt their evaluation criteria based on content type. No changes needed to the pipeline flow.
+
+**Note:** Text forensics (Step 1.5) runs for both video and text content. For video, it analyzes the transcript; for text, it analyzes the full text body.
 
 ## Error Handling
 

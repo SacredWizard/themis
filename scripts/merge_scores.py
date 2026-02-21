@@ -111,6 +111,7 @@ def merge_council_scores(
     critic: dict | None = None,
     cross_council_content_response: dict | None = None,
     cross_council_market_response: dict | None = None,
+    authenticity_data: dict | None = None,
 ) -> dict:
     """
     Merge all council outputs into final component scores.
@@ -199,7 +200,7 @@ def merge_council_scores(
                 "resolution": tension.get("assessment", ""),
             })
 
-    return {
+    result = {
         "virality": {
             "score": virality_score,
             "tier": score_to_tier(virality_score),
@@ -208,6 +209,12 @@ def merge_council_scores(
         },
         "disagreements": all_disagreements,
     }
+
+    # Pass through authenticity data if provided (separate from virality)
+    if authenticity_data is not None:
+        result["authenticity"] = authenticity_data
+
+    return result
 
 
 def build_metadata(mode: str, debate_rounds: int, judges_used: list[str],
@@ -265,6 +272,8 @@ def main():
     parser.add_argument("--market-council", required=True,
                         help="Market Council consensus JSON (string or file path)")
     parser.add_argument("--critic", help="Critic output JSON (string or file path)")
+    parser.add_argument("--authenticity",
+                        help="Authenticity data JSON (string or file path)")
     parser.add_argument("--mode", default="full", choices=["full", "fast"])
     parser.add_argument("--total-tokens", type=int, default=0)
     args = parser.parse_args()
@@ -280,12 +289,15 @@ def main():
     content = load_json(args.content_council)
     market = load_json(args.market_council)
     critic = load_json(args.critic) if args.critic else None
+    authenticity = load_json(args.authenticity) if args.authenticity else None
 
-    result = merge_council_scores(content, market, critic)
+    result = merge_council_scores(content, market, critic,
+                                  authenticity_data=authenticity)
 
     debate_rounds = 2 if args.mode == "full" else 1
     judges = ["hook_analyst", "emotion_analyst", "production_analyst",
-              "trend_analyst", "subject_analyst", "audience_mapper"]
+              "authenticity_analyst", "trend_analyst", "subject_analyst",
+              "audience_mapper"]
     metadata = build_metadata(args.mode, debate_rounds, judges, args.total_tokens)
 
     output = {**result, "metadata": metadata}

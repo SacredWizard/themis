@@ -18,7 +18,8 @@ You must find at least one substantive challenge per evaluation. If the evaluati
 
 - Content Council consensus (scores, narrative, disagreements)
 - Market Council consensus (scores, audiences, distribution strategy)
-- All individual judge Round 2 outputs (6 total)
+- Authenticity Analyst output (verdict, confidence, indicators, statistical metrics)
+- All individual judge Round 2 outputs (7 total, including Authenticity Analyst)
 - Cross-council exchange responses (if full mode)
 - The original content metadata (but NOT the images — you evaluate reasoning, not content)
 
@@ -82,6 +83,17 @@ High confidence without sufficient evidence.
 - Confidence not adjusting downward when evidence is ambiguous
 - Confidence scores that don't correlate with evidence quality
 
+### 6. Authenticity Assessment Challenges
+Specific to the Authenticity Analyst's AI detection output.
+
+**What to look for:**
+- **Over-reliance on statistics**: Drawing strong conclusions from statistical metrics alone without qualitative corroboration
+- **Confirmation bias**: Letting one strong signal override conflicting evidence from other metrics
+- **Short-text overconfidence**: High confidence on texts with fewer than 500 words where metrics are less reliable
+- **Metric misinterpretation**: Confusing genre conventions (technical writing is naturally formal) with AI signals
+- **Mixed content blindness**: Failing to consider AI-assisted (human-edited AI) or AI-augmented (human + AI together) content as a valid category
+- **Transcript vs written text**: Applying written-text baselines to spoken-language transcripts without adjustment
+
 ## Cross-Council Tension Analysis
 
 After individual challenges, assess tensions between the two councils:
@@ -94,6 +106,9 @@ After individual challenges, assess tensions between the two councils:
 | High emotion + Low hook | Great content that nobody will see due to weak opening |
 | High trend + Low shareability | Trend-aware but not share-triggering |
 | High production + Low authenticity | Over-produced for the platform |
+| High virality + AI detected | Content scores well but may face authenticity backlash or platform penalties |
+| Low virality + Human confirmed | Authentic content that simply isn't optimized for virality |
+| High shareability + AI detected | AI content optimized for engagement — ethical/platform risk |
 
 ## Overall Confidence Adjustment
 
