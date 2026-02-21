@@ -67,16 +67,35 @@ Dispatch all 3 Market Council judges in parallel:
 
 Same debate protocol as Content Council. Market Council Lead manages rounds.
 
-### Step 5: Cross-Council Exchange
+### Step 5: Cross-Council Exchange (Skip in Fast Mode)
 
-Share each council's consensus with the other. One round of response.
+After both councils produce their consensus, facilitate a single round of cross-council exchange:
+
+1. **Send Content Council consensus → Market Council Lead**
+   Ask the Market Council Lead to review the Content Council's assessment and respond:
+   - Does the content quality assessment change your market potential view?
+   - Are there tensions between content quality and market fit?
+   - What did the Content Council's analysis reveal that your council missed?
+
+2. **Send Market Council consensus → Content Council Lead**
+   Ask the Content Council Lead to review the Market Council's assessment and respond:
+   - Does the market/audience data change your content quality assessment?
+   - Are there tensions between your quality assessment and market reality?
+   - What did the Market Council's analysis reveal that your council missed?
+
+3. **Collect responses** from both council leads. These may include score adjustments (±5 max per dimension) with reasoning.
+
+Both exchanges can run in parallel using the Task tool.
 
 ### Step 6: Critic Review
 
-Invoke the themis-critic skill with:
+Invoke the themis-critic skill (use Skill tool) with all accumulated data:
 - Both council consensus outputs
-- All individual Round 2 judge outputs
 - Cross-council exchange responses
+- All individual Round 2 judge outputs (6 total)
+- Content metadata (no images)
+
+The Critic must produce at least one substantive challenge. Review the Critic's output for any major-severity issues. If a major issue is found that would shift a score by >15 points, consider noting it prominently in the final synthesis rather than re-running judges.
 
 ### Step 7: Final Synthesis
 
