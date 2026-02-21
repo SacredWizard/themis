@@ -57,12 +57,13 @@ def strip_base64(frames: list[dict]) -> list[dict]:
 def format_for_judge(payload: dict, judge_name: str,
                      include_images: bool = True) -> dict:
     """Build a judge-specific view of the payload."""
+    content_type = payload.get("content_type", "video")
     config = JUDGE_KEYFRAME_CONFIGS.get(judge_name, {"strategy": "all"})
     selected = select_keyframes(payload.get("keyframes", []), config)
 
     judge_payload = {
         "source_file": payload["source_file"],
-        "content_type": payload["content_type"],
+        "content_type": content_type,
         "metadata": payload["metadata"],
         "transcript": payload["transcript"],
         "keyframe_count_total": payload.get("keyframe_count", len(payload.get("keyframes", []))),
@@ -70,7 +71,14 @@ def format_for_judge(payload: dict, judge_name: str,
         "keyframe_selection_strategy": config["strategy"],
     }
 
-    if include_images:
+    if content_type == "text":
+        # Text payloads have no images; include sections instead
+        judge_payload["keyframes"] = []
+        judge_payload["keyframe_count_provided"] = 0
+        judge_payload["keyframe_selection_strategy"] = "none"
+        if "sections" in payload:
+            judge_payload["sections"] = payload["sections"]
+    elif include_images:
         judge_payload["keyframes"] = selected
     else:
         judge_payload["keyframes"] = strip_base64(selected)
